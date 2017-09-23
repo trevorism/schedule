@@ -42,7 +42,7 @@ class WorkerController {
             ScheduleType type = ScheduleTypeFactory.create(schedule.type)
             if(!(type instanceof ImmediateScheduleType)) {
                 log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
-                scheduleService.enqueue(schedule)
+                 scheduleService.enqueue(schedule)
             }
         }
         else{

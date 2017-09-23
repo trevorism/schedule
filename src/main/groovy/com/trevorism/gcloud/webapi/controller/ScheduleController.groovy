@@ -42,7 +42,7 @@ class ScheduleController {
         scheduleService.getByName(name)
     }
 
-    @ApiOperation(value = "Create a new ScheduledTask")
+    @ApiOperation(value = "Create a new ScheduledTask **Secure")
     @POST
     @Path("schedule")
     @Secure
@@ -54,7 +54,7 @@ class ScheduleController {
         return createdSchedule
     }
 
-    @ApiOperation(value = "Delete a ScheduledTask with the {name}")
+    @ApiOperation(value = "Delete a ScheduledTask with the {name} **Secure")
     @DELETE
     @Secure
     @Path("schedule/{name}")

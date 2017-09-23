@@ -3,6 +3,7 @@ package com.trevorism.gcloud.service
 import com.google.appengine.api.taskqueue.QueueFactory
 import com.google.appengine.api.taskqueue.TaskOptions
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
@@ -15,7 +16,7 @@ import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 class DefaultScheduleService implements ScheduleService {
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
-    private Gson gson = new Gson()
+    private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
     private com.google.appengine.api.taskqueue.Queue queue = QueueFactory.getDefaultQueue()
 
     @Override
