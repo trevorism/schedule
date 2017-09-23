@@ -14,7 +14,7 @@ class DailyScheduleType implements ScheduleType {
     @Override
     long getCountdownMillis(ScheduledTask schedule) {
         Date now = new Date()
-        if(schedule.startDate.after(now)){
+        if(schedule.startDate && schedule.startDate.after(now)){
             return schedule.startDate.getTime() - now.getTime()
         }
         else {

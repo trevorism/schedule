@@ -36,7 +36,8 @@ class WorkerController {
     @Path("default")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    boolean performAction(String name){
+    boolean performAction(ScheduledTask task){
+        String name = task.name
         ScheduledTask schedule = scheduleService.getByName(name)
         if(schedule?.enabled){
             log.info("Performing work on scheduled task: ${name}")

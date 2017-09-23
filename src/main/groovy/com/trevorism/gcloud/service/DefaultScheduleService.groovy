@@ -37,7 +37,9 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     boolean delete(String name) {
-        repository.delete(getByName(name).id)
+        ScheduledTask task = getByName(name)
+        if(task)
+            repository.delete(task.id)
     }
 
     @Override

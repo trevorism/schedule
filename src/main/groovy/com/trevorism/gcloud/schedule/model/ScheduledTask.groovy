@@ -12,6 +12,6 @@ class ScheduledTask {
     boolean enabled
 
     String endpoint
-    String httpMethod
+    String httpMethod = "post"
     String requestJson
 }

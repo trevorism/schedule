@@ -1,37 +1,56 @@
 package com.trevorism.gcloud.webapi.controller
 
+import com.google.appengine.api.datastore.DatastoreService
+import com.google.appengine.api.datastore.DatastoreServiceFactory
+import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
+import io.swagger.annotations.Contact
+import io.swagger.annotations.Info
+import io.swagger.annotations.SwaggerDefinition
+
 import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType
+import javax.ws.rs.core.Response
 
+@Api("Root Operations")
+@SwaggerDefinition(
+        info = @Info(
+                description = "Schedule repetitive tasks",
+                version = "1",
+                title = "Schedule API",
+                contact = @Contact(
+                        name = "Trevor Brooks",
+                        url = "http://www.trevorism.com"
+                )
+        )
+)
 @Path("/")
 class RootController {
 
+    private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService()
+
+    @ApiOperation(value = "Returns 'pong' if the application is alive")
     @GET
     @Path("ping")
     @Produces(MediaType.APPLICATION_JSON)
     String ping(){
-        "pong"
+        if(datastore.getDatastoreAttributes().datastoreType)
+            return "pong"
+        return "gnop"
     }
 
+    @ApiOperation(value = "Context root of the application")
     @GET
-    @Path("")
-    String getEndpoints(){
-        '<a href="/ping">/ping</a> </br> <a href="/help">/help</a> </br> <a href="/api/schedule">/api/schedule</a>'
+    String displayHelpLink(){
+        '<h1>Datastore API</h1><br/>Visit the help page at <a href="/help">/help'
     }
 
+    @ApiOperation(value = "Shows this help page")
     @GET
     @Path("help")
-    String help(){
-        return """
-<h3>API documentation for schedule </h3><br/><br/>
-HTTP GET <a href="/ping">/ping</a> -- Returns "pong" if the application is working
-HTTP GET <a href="/api/schedule">/api/schedule</a> -- Lists all the scheduled tasks
-HTTP GET <a href="/api/schedule/{name}">/api/schedule/{name}</a> -- Get scheduled task details
-HTTP POST <a href="/api/schedule/">/ping</a> -- Create a new scheduled task
-HTTP DELETE <a href="/api/schedule/{name}">/api/schedule/{name}</a> -- Delete a scheduled task
-HTTP POST <a href="/_ah/queue/default">/_ah/queue/default</a> -- Perform the work of a scheduled task
-"""
+    Response help(){
+        Response.temporaryRedirect(new URI("/swagger/index.html")).build()
     }
 }
