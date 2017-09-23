@@ -1,12 +1,6 @@
 package com.trevorism.gcloud.webapi.controller
 
-import com.google.appengine.api.datastore.DatastoreService
-import com.google.appengine.api.datastore.DatastoreServiceFactory
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
-import io.swagger.annotations.Contact
-import io.swagger.annotations.Info
-import io.swagger.annotations.SwaggerDefinition
+import io.swagger.annotations.*
 
 import javax.ws.rs.GET
 import javax.ws.rs.Path
@@ -40,7 +34,7 @@ class RootController {
     @ApiOperation(value = "Context root of the application")
     @GET
     String displayHelpLink(){
-        '<h1>Datastore API</h1><br/>Visit the help page at <a href="/help">/help'
+        '<h1>Schedule API</h1><br/>Visit the help page at <a href="/help">/help'
     }
 
     @ApiOperation(value = "Shows this help page")

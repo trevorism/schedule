@@ -5,6 +5,7 @@ import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Secure
 import io.swagger.annotations.Api
+import io.swagger.annotations.ApiOperation
 
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
@@ -24,6 +25,7 @@ class ScheduleController {
 
     private ScheduleService scheduleService = new DefaultScheduleService()
 
+    @ApiOperation(value = "Get a list of all ScheduledTasks")
     @GET
     @Path("schedule")
     @Produces(MediaType.APPLICATION_JSON)
@@ -31,6 +33,7 @@ class ScheduleController {
         scheduleService.list()
     }
 
+    @ApiOperation(value = "View a ScheduledTask with the {name}")
     @GET
     @Path("schedule/{name}")
     @Produces(MediaType.APPLICATION_JSON)
@@ -39,6 +42,7 @@ class ScheduleController {
         scheduleService.getByName(name)
     }
 
+    @ApiOperation(value = "Create a new ScheduledTask")
     @POST
     @Path("schedule")
     @Secure
@@ -50,6 +54,7 @@ class ScheduleController {
         return createdSchedule
     }
 
+    @ApiOperation(value = "Delete a ScheduledTask with the {name}")
     @DELETE
     @Secure
     @Path("schedule/{name}")
