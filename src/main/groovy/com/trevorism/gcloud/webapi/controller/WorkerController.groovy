@@ -6,8 +6,6 @@ import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.gcloud.service.type.ImmediateScheduleType
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
-import com.trevorism.http.HttpClient
-import com.trevorism.http.JsonHttpClient
 import com.trevorism.http.headers.HeadersHttpClient
 import com.trevorism.http.headers.HeadersJsonHttpClient
 import com.trevorism.secure.PasswordProvider
@@ -16,7 +14,6 @@ import javax.ws.rs.Consumes
 import javax.ws.rs.POST
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
-
 import javax.ws.rs.core.MediaType
 import java.util.logging.Logger
 
@@ -43,7 +40,7 @@ class WorkerController {
             log.info("Performing work on scheduled task: ${name}")
             client."${schedule.httpMethod}"(schedule.endpoint, schedule.requestJson,["Authorization":provider.password])
             ScheduleType type = ScheduleTypeFactory.create(schedule.type)
-            if(!type instanceof ImmediateScheduleType) {
+            if(!(type instanceof ImmediateScheduleType)) {
                 log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
                 scheduleService.enqueue(schedule)
             }

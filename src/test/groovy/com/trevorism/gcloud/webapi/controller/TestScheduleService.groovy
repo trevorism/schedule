@@ -8,7 +8,7 @@ import com.trevorism.gcloud.service.ScheduleService
  */
 class TestScheduleService implements ScheduleService {
 
-    int enqueueCalled = 0
+    int enqueueCalled
     List<ScheduledTask> tasks = []
 
     @Override
@@ -36,11 +36,11 @@ class TestScheduleService implements ScheduleService {
 
     @Override
     void enqueue(ScheduledTask schedule) {
-        enqueueCalled++
+        ++enqueueCalled
     }
 
     static ScheduledTask createTestScheduledTask() {
         new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/10")
+                endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
     }
 }

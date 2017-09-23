@@ -27,7 +27,8 @@ class WorkerControllerTest {
         ScheduledTask task = TestScheduleService.createTestScheduledTask()
         task.enabled = true
         workerController.performAction(task)
-        //assert workerController.scheduleService.enqueueCalled == 1
+
+        assert workerController.scheduleService.enqueueCalled == 1
 
     }
 }

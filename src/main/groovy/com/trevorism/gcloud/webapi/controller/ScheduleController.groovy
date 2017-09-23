@@ -4,6 +4,7 @@ import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Secure
+import io.swagger.annotations.Api
 
 import javax.ws.rs.Consumes
 import javax.ws.rs.DELETE
@@ -17,6 +18,7 @@ import javax.ws.rs.core.MediaType
 /**
  * @author tbrooks
  */
+@Api("Schedule Operations")
 @Path("/api")
 class ScheduleController {
 
