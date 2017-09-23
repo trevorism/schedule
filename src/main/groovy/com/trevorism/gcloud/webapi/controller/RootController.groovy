@@ -29,16 +29,12 @@ import javax.ws.rs.core.Response
 @Path("/")
 class RootController {
 
-    private final DatastoreService datastore = DatastoreServiceFactory.getDatastoreService()
-
     @ApiOperation(value = "Returns 'pong' if the application is alive")
     @GET
     @Path("ping")
     @Produces(MediaType.APPLICATION_JSON)
     String ping(){
-        if(datastore.getDatastoreAttributes().datastoreType)
-            return "pong"
-        return "gnop"
+        return "pong"
     }
 
     @ApiOperation(value = "Context root of the application")
