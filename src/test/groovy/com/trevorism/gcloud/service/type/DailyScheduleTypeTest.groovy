@@ -16,6 +16,7 @@ class DailyScheduleTypeTest {
     @Test
     void testGetCountdownMillis() {
         def type = new DailyScheduleType()
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) == 1000 * 60 * 60 * 24
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) <= 1000 * 60 * 60 * 24
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) > 86390000
     }
 }

@@ -17,8 +17,6 @@ class MinuteScheduleType implements ScheduleType {
         if(schedule.startDate && schedule.startDate.after(now)){
             return schedule.startDate.getTime() - now.getTime()
         }
-        else {
-            return 1000 * 60
-        }
+        return 1000 * 60
     }
 }
