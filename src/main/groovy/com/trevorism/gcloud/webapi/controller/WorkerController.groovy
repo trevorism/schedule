@@ -38,7 +38,7 @@ class WorkerController {
         ScheduledTask schedule = scheduleService.getByName(name)
         if(schedule?.enabled){
             log.info("Performing work on scheduled task: ${name}")
-            client."${schedule.httpMethod}"(schedule.endpoint, schedule.requestJson,["Authorization":provider.password])
+            client."${schedule.httpMethod.toLowerCase()}"(schedule.endpoint, schedule.requestJson,["Authorization":provider.password])
             ScheduleType type = ScheduleTypeFactory.create(schedule.type)
             if(!(type instanceof ImmediateScheduleType)) {
                 log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
