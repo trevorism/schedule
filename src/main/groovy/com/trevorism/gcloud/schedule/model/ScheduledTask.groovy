@@ -5,7 +5,6 @@ package com.trevorism.gcloud.schedule.model
  */
 class ScheduledTask {
 
-    String id
     String name
     String type
     Date startDate

@@ -37,23 +37,31 @@ class WorkerController {
         String name = task.name
         ScheduledTask schedule = scheduleService.getByName(name)
         if(schedule?.enabled){
-            log.info("Performing work on scheduled task: ${name}")
-            client."${schedule.httpMethod.toLowerCase()}"(schedule.endpoint, schedule.requestJson,["Authorization":provider.password])
-            ScheduleType type = ScheduleTypeFactory.create(schedule.type)
-            if(!(type instanceof ImmediateScheduleType)) {
-                log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
-                 scheduleService.enqueue(schedule)
-            }
+            executeAndEnqueueTask(name, schedule)
         }
         else{
-            if(!schedule)
-                log.warning("Scheduled task ${name} not found")
-            else
-                log.info("Scheduled task ${name} is disabled")
+            logDidNotExecuteSchedule(schedule, name)
         }
 
         return schedule?.enabled
 
+    }
+
+    private void executeAndEnqueueTask(String name, ScheduledTask schedule) {
+        log.info("Performing work on scheduled task: ${name}")
+        client."${schedule.httpMethod.toLowerCase()}"(schedule.endpoint, schedule.requestJson, ["Authorization": provider.password])
+        ScheduleType type = ScheduleTypeFactory.create(schedule.type)
+        if (!(type instanceof ImmediateScheduleType)) {
+            log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
+            scheduleService.enqueue(schedule)
+        }
+    }
+
+    private void logDidNotExecuteSchedule(ScheduledTask schedule, String name) {
+        if (!schedule)
+            log.warning("Scheduled task ${name} not found")
+        else
+            log.info("Scheduled task ${name} is disabled")
     }
 
 }

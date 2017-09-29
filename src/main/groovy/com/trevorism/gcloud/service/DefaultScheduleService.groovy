@@ -48,12 +48,14 @@ class DefaultScheduleService implements ScheduleService {
         ScheduleType type = ScheduleTypeFactory.create(schedule.type)
         String json = gson.toJson(schedule)
         long countdownMillis = type.getCountdownMillis(schedule)
-        TaskOptions taskOptions = taskOptions(countdownMillis, json)
+        TaskOptions taskOptions = createTaskOptions(schedule.name, countdownMillis, json)
         queue.add(taskOptions)
+
     }
 
-    private TaskOptions taskOptions(long countdownMillis, String json) {
+    private TaskOptions createTaskOptions(String name, long countdownMillis, String json) {
         TaskOptions taskOptions = TaskOptions.Builder.withCountdownMillis(countdownMillis)
+        taskOptions.taskName(name)
         taskOptions.payload(json, "UTF-8")
         taskOptions.removeHeader("Content-Type")
         taskOptions.headers(["Content-Type": "application/json"])
