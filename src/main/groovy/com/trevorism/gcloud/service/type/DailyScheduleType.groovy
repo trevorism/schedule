@@ -28,7 +28,7 @@ class DailyScheduleType implements ScheduleType {
         ZonedDateTime desiredTime = schedule.startDate.toInstant().atZone(ZoneId.of("UTC"))
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
 
-        if(desiredTime.isBefore(now)){
+        while(desiredTime.isBefore(now)){
             desiredTime = desiredTime.plusDays(1)
         }
 
