@@ -18,7 +18,7 @@ class DefaultScheduleServiceTest {
     void setup(){
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
-        scheduleService.queue = [add : {def options -> addedToQueue++; return null}] as Queue
+        scheduleService.queue = [add : {def options -> addedToQueue++; return null}, deleteTask: {String name -> addedToQueue--; return false}] as Queue
         scheduleService.create(TestScheduleService.createTestScheduledTask())
     }
 
@@ -53,8 +53,17 @@ class DefaultScheduleServiceTest {
     }
 
     @Test
+    void testUpdate() {
+        ScheduledTask task = new ScheduledTask(name: "test", type: "hourly", startDate: new Date(), enabled: true, endpoint: "endpoint")
+        scheduleService.update(task, "test")
+        assert scheduleService.list().size() == 1
+        assert scheduleService.getByName("test").enabled
+        assert scheduleService.getByName("test").type == "hourly"
+    }
+
+    @Test
     void testEnqueue() {
         scheduleService.enqueue(scheduleService.getByName("test"))
-        assert addedToQueue == 1
+        assert addedToQueue == 2
     }
 }

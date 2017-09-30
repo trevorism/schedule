@@ -51,7 +51,9 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     ScheduledTask update(String s, ScheduledTask scheduledTask, String s1) {
-        return null
+        tasks.remove(get(s))
+        create(scheduledTask)
+        return scheduledTask
     }
 
     @Override

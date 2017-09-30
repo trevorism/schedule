@@ -44,7 +44,6 @@ class ScheduleController {
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask create(ScheduledTask schedule) {
         ScheduledTask createdSchedule = scheduleService.create(schedule)
-        scheduleService.enqueue(createdSchedule)
         return createdSchedule
     }
 

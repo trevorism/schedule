@@ -25,15 +25,24 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate() {
-        def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTask())
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
+        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(id: "123", name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "get")
 
         validator.validate(task)
     }
+
+    @Test(expected = BadRequestException)
+    void testValidate_InvalidNullName() {
+        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+
+        def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
+                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "get")
+
+        validator.validate(task)
+    }
+
 
     @Test(expected = BadRequestException)
     void testValidate_InvalidMatchingName() {
@@ -49,9 +58,7 @@ class ScheduledTaskValidatorTest {
 
     @Test(expected = BadRequestException)
     void testValidate_InvalidHttpMethod() {
-        def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTask())
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
+        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "execute")
@@ -61,9 +68,7 @@ class ScheduledTaskValidatorTest {
 
     @Test(expected = BadRequestException)
     void testValidate_InvalidEndpoint() {
-        def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTask())
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
+        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}", httpMethod: "get")
 
@@ -72,9 +77,7 @@ class ScheduledTaskValidatorTest {
 
     @Test(expected = BadRequestException)
     void testValidate_InvalidId() {
-        def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTask())
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
+        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
                 requestJson: "{}", endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")

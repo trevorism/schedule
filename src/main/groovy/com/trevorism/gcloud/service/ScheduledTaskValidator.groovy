@@ -17,6 +17,7 @@ class ScheduledTaskValidator {
     }
 
     static ScheduledTask cleanup(ScheduledTask task){
+        task.name = task.name?.toLowerCase()
         task.httpMethod = task.httpMethod?.toLowerCase()
         if(task.endpoint)
             task.endpoint = CleanUrl.startWithHttp(task.endpoint)
@@ -24,10 +25,12 @@ class ScheduledTaskValidator {
         return task
     }
 
-    void validate(ScheduledTask scheduledTask) {
+    void validate(ScheduledTask scheduledTask, boolean allowDuplicate = false) {
         try{
             (!scheduledTask.id) ?: Integer.parseInt(scheduledTask.id)
-            if(service.getByName(scheduledTask.name)){
+            if(!scheduledTask.name)
+                throw new Exception("Scheduled task must have a name")
+            if(!allowDuplicate && service.getByName(scheduledTask.name)){
                 throw new Exception("Scheduled task already exists")
             }
             if(!(["get","post","put","delete"].contains(scheduledTask.httpMethod)))

@@ -23,8 +23,10 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     ScheduledTask create(ScheduledTask schedule) {
         schedule = ScheduledTaskValidator.cleanup(schedule)
-        validator.validate(schedule)
+        validator.validate(schedule, false)
         repository.create(schedule)
+        enqueue(schedule)
+        return schedule
     }
 
     @Override
@@ -35,8 +37,15 @@ class DefaultScheduleService implements ScheduleService {
     }
 
     @Override
-    ScheduledTask update(ScheduledTask scheduledTask, String name) {
-        return scheduledTask
+    ScheduledTask update(ScheduledTask schedule, String name) {
+        schedule = ScheduledTaskValidator.cleanup(schedule)
+        validator.validate(schedule, true)
+
+        ScheduledTask existingTask = getByName(name)
+        queue.deleteTask(name)
+
+        repository.update(existingTask.id, schedule)
+        enqueue(schedule)
     }
 
     @Override

@@ -46,7 +46,6 @@ class ScheduleControllerTest {
         scheduleController.create(task)
 
         assert scheduleController.list().size() == 2
-        assert scheduleController.scheduleService.enqueueCalled == 2
         scheduleController.delete("test2")
         assert scheduleController.list().size() == 1
 
@@ -55,11 +54,19 @@ class ScheduleControllerTest {
     @Test
     void testDelete() {
         scheduleController.delete("test")
-        assert scheduleController.scheduleService.enqueueCalled == 1
         assert scheduleController.list().size() == 0
 
     }
 
+    @Test
+    void testUpdate() {
 
+        ScheduledTask task = new ScheduledTask(name: "test", type: "progressive", startDate: new Date(), enabled: true)
+        scheduleController.update("test", task)
+        assert scheduleController.list().size() == 1
+        assert scheduleController.get("test").enabled
+        assert scheduleController.get("test").type == "progressive"
+
+    }
 
 }
