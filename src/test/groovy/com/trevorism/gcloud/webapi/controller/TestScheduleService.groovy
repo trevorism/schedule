@@ -25,6 +25,13 @@ class TestScheduleService implements ScheduleService {
     }
 
     @Override
+    ScheduledTask update(ScheduledTask scheduledTask, String name) {
+        tasks.remove(getByName(name))
+        tasks.add(scheduledTask)
+        return scheduledTask
+    }
+
+    @Override
     List<ScheduledTask> list() {
         tasks
     }

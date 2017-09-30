@@ -24,7 +24,7 @@ class DefaultScheduleServiceTest {
 
     @Test
     void testCreate() {
-        ScheduledTask task = new ScheduledTask(name: "test2", type: "minute", startDate: new Date(), enabled: true)
+        ScheduledTask task = new ScheduledTask(name: "test2", type: "minute", startDate: new Date(), enabled: true, endpoint: "endpoint")
         ScheduledTask createdTask = scheduleService.create(task)
         assert scheduleService.list().size() == 2
         assert createdTask.id

@@ -18,9 +18,12 @@ class DefaultScheduleService implements ScheduleService {
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
     private com.google.appengine.api.taskqueue.Queue queue = QueueFactory.getDefaultQueue()
+    private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
 
     @Override
     ScheduledTask create(ScheduledTask schedule) {
+        schedule = ScheduledTaskValidator.cleanup(schedule)
+        validator.validate(schedule)
         repository.create(schedule)
     }
 
@@ -29,6 +32,11 @@ class DefaultScheduleService implements ScheduleService {
         repository.list().find{
             it.name == name
         }
+    }
+
+    @Override
+    ScheduledTask update(ScheduledTask scheduledTask, String name) {
+        return scheduledTask
     }
 
     @Override
@@ -61,6 +69,5 @@ class DefaultScheduleService implements ScheduleService {
         taskOptions.headers(["Content-Type": "application/json"])
         taskOptions
     }
-
 
 }

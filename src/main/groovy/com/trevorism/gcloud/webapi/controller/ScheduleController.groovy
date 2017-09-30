@@ -7,13 +7,7 @@ import com.trevorism.secure.Secure
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 
-import javax.ws.rs.Consumes
-import javax.ws.rs.DELETE
-import javax.ws.rs.GET
-import javax.ws.rs.POST
-import javax.ws.rs.Path
-import javax.ws.rs.PathParam
-import javax.ws.rs.Produces
+import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
 
 /**
@@ -29,7 +23,7 @@ class ScheduleController {
     @GET
     @Path("schedule")
     @Produces(MediaType.APPLICATION_JSON)
-    List<ScheduledTask> list(){
+    List<ScheduledTask> list() {
         scheduleService.list()
     }
 
@@ -38,7 +32,7 @@ class ScheduleController {
     @Path("schedule/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    ScheduledTask get(@PathParam("name") String name){
+    ScheduledTask get(@PathParam("name") String name) {
         scheduleService.getByName(name)
     }
 
@@ -48,10 +42,21 @@ class ScheduleController {
     @Secure
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    ScheduledTask create(ScheduledTask schedule){
+    ScheduledTask create(ScheduledTask schedule) {
         ScheduledTask createdSchedule = scheduleService.create(schedule)
         scheduleService.enqueue(createdSchedule)
         return createdSchedule
+    }
+
+    @ApiOperation(value = "Update a ScheduledTask **Secure")
+    @PUT
+    @Path("schedule/{name}")
+    @Secure
+    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_JSON)
+    ScheduledTask update(@PathParam("name") String name, ScheduledTask schedule) {
+        ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
+        return updatedSchedule
     }
 
     @ApiOperation(value = "Delete a ScheduledTask with the {name} **Secure")
@@ -60,7 +65,7 @@ class ScheduleController {
     @Path("schedule/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
-    boolean delete(@PathParam("name") String name){
+    boolean delete(@PathParam("name") String name) {
         scheduleService.delete(name)
     }
 

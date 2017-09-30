@@ -14,6 +14,8 @@ class ScheduleTypeFactory {
             return new HourlyScheduleType()
         if("minute" == name)
             return new MinuteScheduleType()
+        if("progressive" == name)
+            return new ProgressiveScheduleType()
 
         return new ImmediateScheduleType()
     }

@@ -9,8 +9,10 @@ interface ScheduleService {
 
     ScheduledTask create(ScheduledTask schedule)
     ScheduledTask getByName(String name)
+    ScheduledTask update(ScheduledTask scheduledTask, String name)
     List<ScheduledTask> list()
     boolean delete(String name)
 
     void enqueue(ScheduledTask schedule)
+
 }
