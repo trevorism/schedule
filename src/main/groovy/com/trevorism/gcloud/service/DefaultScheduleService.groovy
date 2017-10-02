@@ -24,7 +24,7 @@ class DefaultScheduleService implements ScheduleService {
     ScheduledTask create(ScheduledTask schedule) {
         schedule = ScheduledTaskValidator.cleanup(schedule)
         validator.validate(schedule, false)
-        repository.create(schedule)
+        schedule = repository.create(schedule)
         enqueue(schedule)
         return schedule
     }
@@ -56,8 +56,10 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     boolean delete(String name) {
         ScheduledTask task = getByName(name)
-        if(task)
+        if(task) {
             repository.delete(task.id)
+            queue.deleteTask(task.name)
+        }
     }
 
     @Override
@@ -67,7 +69,6 @@ class DefaultScheduleService implements ScheduleService {
         long countdownMillis = type.getCountdownMillis(schedule)
         TaskOptions taskOptions = createTaskOptions(schedule.name, countdownMillis, json)
         queue.add(taskOptions)
-
     }
 
     private TaskOptions createTaskOptions(String name, long countdownMillis, String json) {
