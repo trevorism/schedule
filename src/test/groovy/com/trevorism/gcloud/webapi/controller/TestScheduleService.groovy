@@ -46,6 +46,11 @@ class TestScheduleService implements ScheduleService {
         ++enqueueCalled
     }
 
+    @Override
+    boolean enqueueAll() {
+        return false
+    }
+
     static ScheduledTask createTestScheduledTask() {
         new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")

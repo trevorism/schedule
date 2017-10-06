@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<cronentries>
+    <cron>
+        <url>/api/enqueueAll</url>
+        <target>schedule</target>
+        <description>Re-enqueue the scheduled tasks</description>
+        <schedule>every 1 hour</schedule>
+    </cron>
+</cronentries>

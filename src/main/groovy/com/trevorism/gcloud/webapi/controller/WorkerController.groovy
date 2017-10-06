@@ -52,12 +52,12 @@ class WorkerController {
         client."${schedule.httpMethod.toLowerCase()}"(schedule.endpoint, schedule.requestJson, ["Authorization": provider.password])
         ScheduleType type = ScheduleTypeFactory.create(schedule.type)
         if (!(type instanceof ImmediateScheduleType)) {
-            log.info("Enqueuing the next run in ${type.getCountdownMillis(schedule)} milliseconds")
+            log.info("Enqueuing the next run for task ${name}")
             scheduleService.enqueue(schedule)
         }
     }
 
-    private void logDidNotExecuteSchedule(ScheduledTask schedule, String name) {
+    private static void logDidNotExecuteSchedule(ScheduledTask schedule, String name) {
         if (!schedule)
             log.warning("Scheduled task ${name} not found")
         else

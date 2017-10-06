@@ -14,5 +14,5 @@ interface ScheduleService {
     boolean delete(String name)
 
     void enqueue(ScheduledTask schedule)
-
+    boolean enqueueAll()
 }

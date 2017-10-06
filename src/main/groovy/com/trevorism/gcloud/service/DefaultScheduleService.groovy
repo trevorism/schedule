@@ -1,6 +1,7 @@
 package com.trevorism.gcloud.service
 
 import com.google.appengine.api.taskqueue.QueueFactory
+import com.google.appengine.api.taskqueue.TaskHandle
 import com.google.appengine.api.taskqueue.TaskOptions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
@@ -10,10 +11,14 @@ import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 
+import java.util.logging.Logger
+
 /**
  * @author tbrooks
  */
 class DefaultScheduleService implements ScheduleService {
+
+    private static final Logger log = Logger.getLogger(DefaultScheduleService.class.name)
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
@@ -42,10 +47,10 @@ class DefaultScheduleService implements ScheduleService {
         validator.validate(schedule, true)
 
         ScheduledTask existingTask = getByName(name)
-        queue.deleteTask(name)
+        schedule = repository.update(existingTask.id, schedule)
 
-        repository.update(existingTask.id, schedule)
-        enqueue(schedule)
+        enqueueAll()
+        return schedule
     }
 
     @Override
@@ -58,7 +63,6 @@ class DefaultScheduleService implements ScheduleService {
         ScheduledTask task = getByName(name)
         if(task) {
             repository.delete(task.id)
-            queue.deleteTask(task.name)
         }
     }
 
@@ -68,7 +72,19 @@ class DefaultScheduleService implements ScheduleService {
         String json = gson.toJson(schedule)
         long countdownMillis = type.getCountdownMillis(schedule)
         TaskOptions taskOptions = createTaskOptions(schedule.name, countdownMillis, json)
-        queue.add(taskOptions)
+        TaskHandle handle = queue.add(taskOptions)
+        log.info("Successfully enqueued task: ${handle.name} to run in ${handle.etaMillis} milliseconds")
+    }
+
+    @Override
+    boolean enqueueAll() {
+        queue.purge()
+        Thread.sleep(5000)
+        def list = repository.list()
+        list.each { ScheduledTask st ->
+            enqueue(st)
+        }
+        return list
     }
 
     private TaskOptions createTaskOptions(String name, long countdownMillis, String json) {

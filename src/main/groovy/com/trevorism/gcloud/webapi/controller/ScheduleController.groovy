@@ -9,6 +9,7 @@ import io.swagger.annotations.ApiOperation
 
 import javax.ws.rs.*
 import javax.ws.rs.core.MediaType
+import java.util.logging.Logger
 
 /**
  * @author tbrooks
@@ -17,7 +18,18 @@ import javax.ws.rs.core.MediaType
 @Path("/api")
 class ScheduleController {
 
+    private static final Logger log = Logger.getLogger(ScheduleController.class.name)
     private ScheduleService scheduleService = new DefaultScheduleService()
+
+    @ApiOperation(value = "Enqueue all tasks **Secure")
+    @GET
+    @Secure
+    @Path("enqueueAll")
+    @Produces(MediaType.APPLICATION_JSON)
+    boolean enqueueAll() {
+        log.info("Enqueue all scheduled tasks")
+        scheduleService.enqueueAll()
+    }
 
     @ApiOperation(value = "Get a list of all ScheduledTasks")
     @GET
