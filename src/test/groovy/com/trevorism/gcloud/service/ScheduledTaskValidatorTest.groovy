@@ -20,7 +20,7 @@ class ScheduledTaskValidatorTest {
         def result = validator.cleanup(task)
 
         assert result.httpMethod == "get"
-        assert result.endpoint == "http://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2"
+        assert result.endpoint == "https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2"
     }
 
     @Test

@@ -20,7 +20,7 @@ class ScheduledTaskValidator {
         task.name = task.name?.toLowerCase()
         task.httpMethod = task.httpMethod?.toLowerCase()
         if(task.endpoint)
-            task.endpoint = CleanUrl.startWithHttp(task.endpoint)
+            task.endpoint = CleanUrl.startWithHttps(task.endpoint)
 
         return task
     }

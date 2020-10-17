@@ -1,6 +1,5 @@
 package com.trevorism.gcloud.service
 
-import com.google.appengine.api.taskqueue.Queue
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
 import org.junit.Before
@@ -18,7 +17,6 @@ class DefaultScheduleServiceTest {
     void setup(){
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
-        scheduleService.queue = [add : {def options -> addedToQueue++; return null}, deleteTask: {String name -> addedToQueue--; return false}] as Queue
         scheduleService.create(TestScheduleService.createTestScheduledTask())
     }
 
@@ -61,9 +59,4 @@ class DefaultScheduleServiceTest {
         assert scheduleService.getByName("test").type == "hourly"
     }
 
-    @Test
-    void testEnqueue() {
-        scheduleService.enqueue(scheduleService.getByName("test"))
-        assert addedToQueue == 2
-    }
 }

@@ -1,8 +1,5 @@
 package com.trevorism.gcloud.service
 
-import com.google.appengine.api.taskqueue.QueueFactory
-import com.google.appengine.api.taskqueue.TaskHandle
-import com.google.appengine.api.taskqueue.TaskOptions
 import com.google.gson.Gson
 import com.google.gson.GsonBuilder
 import com.trevorism.data.PingingDatastoreRepository
@@ -22,7 +19,6 @@ class DefaultScheduleService implements ScheduleService {
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
-    private com.google.appengine.api.taskqueue.Queue queue = QueueFactory.getDefaultQueue()
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
 
     @Override
@@ -36,7 +32,7 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     ScheduledTask getByName(String name) {
-        repository.list().find{
+        repository.list().find {
             it.name == name
         }
     }
@@ -61,7 +57,7 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     boolean delete(String name) {
         ScheduledTask task = getByName(name)
-        if(task) {
+        if (task) {
             repository.delete(task.id)
         }
     }
@@ -71,14 +67,10 @@ class DefaultScheduleService implements ScheduleService {
         ScheduleType type = ScheduleTypeFactory.create(schedule.type)
         String json = gson.toJson(schedule)
         long countdownMillis = type.getCountdownMillis(schedule)
-        TaskOptions taskOptions = createTaskOptions(schedule.name, countdownMillis, json)
-        TaskHandle handle = queue.add(taskOptions)
-        log.info("Successfully enqueued task: ${handle.name} to run in ${handle.etaMillis} milliseconds")
     }
 
     @Override
     boolean enqueueAll() {
-        queue.purge()
         Thread.sleep(5000)
         def list = repository.list()
         list.each { ScheduledTask st ->
@@ -87,13 +79,5 @@ class DefaultScheduleService implements ScheduleService {
         return list
     }
 
-    private TaskOptions createTaskOptions(String name, long countdownMillis, String json) {
-        TaskOptions taskOptions = TaskOptions.Builder.withCountdownMillis(countdownMillis)
-        taskOptions.taskName(name)
-        taskOptions.payload(json, "UTF-8")
-        taskOptions.removeHeader("Content-Type")
-        taskOptions.headers(["Content-Type": "application/json"])
-        taskOptions
-    }
 
 }
