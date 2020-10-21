@@ -17,7 +17,7 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     List<ScheduledTask> list(String s) {
-        list(null)
+        list()
     }
 
     @Override
@@ -29,7 +29,7 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     ScheduledTask get(String s, String s1) {
-        get(s, null)
+        get(s)
     }
 
     @Override
@@ -41,7 +41,7 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     ScheduledTask create(ScheduledTask scheduledTask, String s) {
-        create(scheduledTask, null)
+        create(scheduledTask)
     }
 
     @Override
@@ -65,7 +65,7 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     ScheduledTask delete(String s, String s1) {
-        delete(s, null)
+        delete(s)
     }
 
     @Override

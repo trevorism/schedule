@@ -1,12 +1,8 @@
 package com.trevorism.gcloud.service.type
 
-import com.fasterxml.jackson.databind.ObjectMapper
-import com.trevorism.gcloud.schedule.model.ScheduledTask
+
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
 import org.junit.Test
-
-import java.text.DateFormat
-import java.text.SimpleDateFormat
 
 /**
  * @author tbrooks
@@ -21,8 +17,12 @@ class DailyScheduleTypeTest {
     @Test
     void testGetCountdownMillis() {
         def type = new DailyScheduleType()
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) <= 1000 * 60 * 60 * 24
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) > 86390000
+
+        assert -1L == type.getCountdownMillis(TestScheduleService.createTestScheduledEarlier())
+        assert -1L == type.getCountdownMillis(TestScheduleService.createTestScheduledTaskNow())
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledLater()) > 0
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledLater()) < 1000 * 60 * 60
+
     }
 
 }

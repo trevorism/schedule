@@ -17,6 +17,6 @@ class HourlyScheduleTypeTest {
     @Test
     void testGetCountdownMillis() {
         def type = new HourlyScheduleType()
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) == 60 * 1000 * 60
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTaskNow()) == -1
     }
 }

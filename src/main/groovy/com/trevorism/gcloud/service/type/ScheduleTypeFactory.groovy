@@ -7,15 +7,11 @@ class ScheduleTypeFactory {
 
     private ScheduleTypeFactory(){}
 
-    static ScheduleType create(String name){
-        if("daily" == name)
+    static ScheduleType create(String taskType){
+        if("daily" == taskType)
             return new DailyScheduleType()
-        if("hourly" == name)
+        if("hourly" == taskType)
             return new HourlyScheduleType()
-        if("minute" == name)
-            return new MinuteScheduleType()
-        if("progressive" == name)
-            return new ProgressiveScheduleType()
 
         return new ImmediateScheduleType()
     }

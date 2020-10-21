@@ -17,6 +17,6 @@ class ImmediateScheduleTypeTest {
     @Test
     void testGetCountdownMillis() {
         def type = new ImmediateScheduleType()
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTask()) == 0
+        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTaskNow()) == 0
     }
 }

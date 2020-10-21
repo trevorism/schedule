@@ -48,6 +48,8 @@ dependencies {
     implementation 'io.swagger:swagger-jersey2-jaxrs:1.6.2'
     implementation 'com.google.code.gson:gson:2.8.6'
 
+    implementation 'com.google.cloud:google-cloud-tasks:1.30.4'
+
     implementation 'com.trevorism:secure-http-utils:0.1.0'
     implementation 'com.trevorism:datastore-client:2.0.0'
 
@@ -63,7 +65,7 @@ appengine {
         projectId = "trevorism-gcloud"
         stopPreviousVersion = true
         promote = true
-        version = "0-2-0"
+        version = "0-3-0"
     }
 }
 
@@ -74,4 +76,13 @@ check {
 task deliver {
     dependsOn("build","appengineDeploy")
     appengineDeploy.mustRunAfter("check")
+}
+
+processResources{
+    doLast{
+        copy{
+            from "${System.getProperty("user.home")}/${project.name}/secrets.properties"
+            into "build/resources/main"
+        }
+    }
 }

@@ -15,12 +15,12 @@ class ScheduledTaskValidatorTest {
     void testCleanup() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "GET")
+                endpoint: "endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "GET")
 
         def result = validator.cleanup(task)
 
         assert result.httpMethod == "get"
-        assert result.endpoint == "https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2"
+        assert result.endpoint == "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json"
     }
 
     @Test
@@ -28,7 +28,7 @@ class ScheduledTaskValidatorTest {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(id: "123", name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "get")
+                endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
         validator.validate(task)
     }
@@ -38,7 +38,7 @@ class ScheduledTaskValidatorTest {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "get")
+                endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
         validator.validate(task)
     }
@@ -47,11 +47,11 @@ class ScheduledTaskValidatorTest {
     @Test(expected = BadRequestException)
     void testValidate_InvalidMatchingName() {
         def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTask())
+        service.create(TestScheduleService.createTestScheduledTaskNow())
         ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
 
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "get")
+                endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
         validator.validate(task)
     }
@@ -61,7 +61,7 @@ class ScheduledTaskValidatorTest {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2", httpMethod: "execute")
+                endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "execute")
 
         validator.validate(task)
     }
@@ -80,7 +80,7 @@ class ScheduledTaskValidatorTest {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
-                requestJson: "{}", endpoint: "ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
+                requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json")
 
         validator.validate(task)
     }

@@ -8,8 +8,8 @@ import org.junit.Test
 class ScheduleTypeFactoryTest {
     @Test
     void testCreate() {
-        assert ScheduleTypeFactory.create("minute") instanceof MinuteScheduleType
         assert ScheduleTypeFactory.create("daily") instanceof DailyScheduleType
+        assert ScheduleTypeFactory.create("hourly") instanceof HourlyScheduleType
         assert ScheduleTypeFactory.create(null) instanceof ImmediateScheduleType
         assert ScheduleTypeFactory.create("blah") instanceof ImmediateScheduleType
 

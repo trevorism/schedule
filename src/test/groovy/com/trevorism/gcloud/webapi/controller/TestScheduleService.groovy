@@ -3,6 +3,8 @@ package com.trevorism.gcloud.webapi.controller
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.ScheduleService
 
+import java.time.Instant
+
 /**
  * @author tbrooks
  */
@@ -51,8 +53,18 @@ class TestScheduleService implements ScheduleService {
         return false
     }
 
-    static ScheduledTask createTestScheduledTask() {
-        new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
+    static ScheduledTask createTestScheduledTaskNow() {
+        new ScheduledTask(name: "test", type: "minute", startDate: Instant.now().toDate(), enabled: false, requestJson: "{}",
+                endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
+    }
+
+    static ScheduledTask createTestScheduledEarlier() {
+        new ScheduledTask(name: "test", type: "minute", startDate: Instant.now().minusSeconds(60*30).toDate(), enabled: false, requestJson: "{}",
+                endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
+    }
+
+    static ScheduledTask createTestScheduledLater() {
+        new ScheduledTask(name: "test", type: "minute", startDate: Instant.now().plusSeconds(30).toDate(), enabled: false, requestJson: "{}",
                 endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
     }
 }

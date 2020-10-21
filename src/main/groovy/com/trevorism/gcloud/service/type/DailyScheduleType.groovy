@@ -17,19 +17,16 @@ class DailyScheduleType implements ScheduleType {
     @Override
     long getCountdownMillis(ScheduledTask schedule) {
         if(!schedule.startDate){
-            return 1000 * 60 * 60 * 24
+            return WILL_NEVER_ENQUEUE
         }
 
         ZonedDateTime desiredTime = schedule.startDate.toInstant().atZone(ZoneId.of("UTC"))
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
+        ZonedDateTime targetTime = ZonedDateTime.now(ZoneId.of("UTC")).withHour(desiredTime.getHour()).withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
 
-        while(desiredTime.isBefore(now)){
-            desiredTime = desiredTime.plusDays(1)
-        }
-
-        long countdownTime = desiredTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
+        long countdownTime = targetTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
         if(countdownTime <= 0){
-            return 1000 * 60 * 60 * 24
+            return WILL_NEVER_ENQUEUE
         }
         return countdownTime
     }

@@ -14,7 +14,7 @@ class ScheduleControllerTest {
     @Before
     void setup(){
         scheduleController.scheduleService = new TestScheduleService()
-        scheduleController.create(TestScheduleService.createTestScheduledTask())
+        scheduleController.create(TestScheduleService.createTestScheduledTaskNow())
     }
 
     @Test
@@ -60,7 +60,6 @@ class ScheduleControllerTest {
 
     @Test
     void testUpdate() {
-
         ScheduledTask task = new ScheduledTask(name: "test", type: "progressive", startDate: new Date(), enabled: true)
         scheduleController.update("test", task)
         assert scheduleController.list().size() == 1

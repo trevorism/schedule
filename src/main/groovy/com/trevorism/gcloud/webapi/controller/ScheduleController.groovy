@@ -3,6 +3,7 @@ package com.trevorism.gcloud.webapi.controller
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
+import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
 import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
@@ -23,7 +24,6 @@ class ScheduleController {
 
     @ApiOperation(value = "Enqueue all tasks **Secure")
     @GET
-    @Secure
     @Path("enqueueAll")
     @Produces(MediaType.APPLICATION_JSON)
     boolean enqueueAll() {
@@ -34,6 +34,7 @@ class ScheduleController {
     @ApiOperation(value = "Get a list of all ScheduledTasks")
     @GET
     @Path("schedule")
+    @Secure(Roles.USER)
     @Produces(MediaType.APPLICATION_JSON)
     List<ScheduledTask> list() {
         scheduleService.list()
@@ -42,6 +43,7 @@ class ScheduleController {
     @ApiOperation(value = "View a ScheduledTask with the {name}")
     @GET
     @Path("schedule/{name}")
+    @Secure(Roles.USER)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask get(@PathParam("name") String name) {
@@ -51,7 +53,7 @@ class ScheduleController {
     @ApiOperation(value = "Create a new ScheduledTask **Secure")
     @POST
     @Path("schedule")
-    @Secure
+    @Secure(Roles.SYSTEM)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask create(ScheduledTask schedule) {
@@ -62,7 +64,7 @@ class ScheduleController {
     @ApiOperation(value = "Update a ScheduledTask **Secure")
     @PUT
     @Path("schedule/{name}")
-    @Secure
+    @Secure(Roles.SYSTEM)
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask update(@PathParam("name") String name, ScheduledTask schedule) {
@@ -72,13 +74,12 @@ class ScheduleController {
 
     @ApiOperation(value = "Delete a ScheduledTask with the {name} **Secure")
     @DELETE
-    @Secure
+    @Secure(Roles.SYSTEM)
     @Path("schedule/{name}")
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     boolean delete(@PathParam("name") String name) {
         scheduleService.delete(name)
     }
-
 
 }

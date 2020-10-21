@@ -14,12 +14,16 @@ class ScheduledTask {
 
     @ApiModelProperty(value = "The type of scheduling task", allowableValues = "daily,hourly,minute,progressive")
     String type
+    @ApiModelProperty(value = "When the task will start")
     Date startDate
+    @ApiModelProperty(value = "Is this task enabled?")
     boolean enabled
 
     @ApiModelProperty(value = "Endpoint for the task")
     String endpoint
     @ApiModelProperty(value = "HTTP Method for the task", allowableValues = "get,post,put,delete")
     String httpMethod = "post"
+
+    @ApiModelProperty(value = "For POST and PUT, the request body", allowableValues = "get,post,put,delete")
     String requestJson
 }
