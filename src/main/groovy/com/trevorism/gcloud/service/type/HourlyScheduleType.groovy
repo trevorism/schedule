@@ -24,6 +24,10 @@ class HourlyScheduleType implements ScheduleType {
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
         ZonedDateTime targetTime = ZonedDateTime.now(ZoneId.of("UTC")).withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
 
+        if(targetTime.isBefore(now)){
+            targetTime = targetTime.plusHours(1)
+        }
+
         long countdownTime = targetTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
         if(countdownTime <= 0){
             return WILL_NEVER_ENQUEUE
