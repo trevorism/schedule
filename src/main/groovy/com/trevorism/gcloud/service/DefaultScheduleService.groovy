@@ -97,7 +97,7 @@ class DefaultScheduleService implements ScheduleService {
 
         if (task.name && scheduleType.name == "immediate") {
             schedule.enabled = false
-            update(schedule, schedule.name)
+            repository.update(schedule.id, schedule)
         }
     }
 

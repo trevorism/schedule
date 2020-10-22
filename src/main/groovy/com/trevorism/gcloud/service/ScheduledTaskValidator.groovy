@@ -25,7 +25,7 @@ class ScheduledTaskValidator {
         return task
     }
 
-    void validate(ScheduledTask scheduledTask, boolean allowDuplicate = false) {
+    void validate(ScheduledTask scheduledTask, boolean allowDuplicate) {
         try{
             (!scheduledTask.id) ?: Integer.parseInt(scheduledTask.id)
             if(!scheduledTask.name)
@@ -39,7 +39,7 @@ class ScheduledTaskValidator {
                 throw new Exception("Endpoint not specified")
 
         }catch (Exception e){
-            throw new BadRequestException("Error creating schedule", e)
+            throw new BadRequestException("Error creating schedule: ${e.message}")
         }
     }
 }

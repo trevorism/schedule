@@ -30,7 +30,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(id: "123", name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 
     @Test(expected = BadRequestException)
@@ -40,7 +40,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 
 
@@ -53,7 +53,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 
     @Test(expected = BadRequestException)
@@ -63,7 +63,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "execute")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 
     @Test(expected = BadRequestException)
@@ -72,7 +72,7 @@ class ScheduledTaskValidatorTest {
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}", httpMethod: "get")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 
     @Test(expected = BadRequestException)
@@ -82,6 +82,6 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
                 requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json")
 
-        validator.validate(task)
+        validator.validate(task, false)
     }
 }
