@@ -22,7 +22,7 @@ class ScheduleController {
     private static final Logger log = Logger.getLogger(ScheduleController.class.name)
     private ScheduleService scheduleService = new DefaultScheduleService()
 
-    @ApiOperation(value = "Enqueue all tasks **Secure")
+    @ApiOperation(value = "Enqueue all tasks")
     @GET
     @Path("enqueueAll")
     @Produces(MediaType.APPLICATION_JSON)
@@ -31,7 +31,7 @@ class ScheduleController {
         scheduleService.enqueueAll()
     }
 
-    @ApiOperation(value = "Get a list of all ScheduledTasks")
+    @ApiOperation(value = "Get a list of all ScheduledTasks **Secure")
     @GET
     @Path("schedule")
     @Secure(Roles.USER)
@@ -40,7 +40,7 @@ class ScheduleController {
         scheduleService.list()
     }
 
-    @ApiOperation(value = "View a ScheduledTask with the {name}")
+    @ApiOperation(value = "View a ScheduledTask with the {name} **Secure")
     @GET
     @Path("schedule/{name}")
     @Secure(Roles.USER)
