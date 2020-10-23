@@ -8,6 +8,7 @@ import com.trevorism.data.Repository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
+import com.trevorism.secure.PropertiesProvider
 
 import java.nio.charset.Charset
 import java.time.Instant
@@ -24,6 +25,16 @@ class DefaultScheduleService implements ScheduleService {
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
     private CloudTasksClient client = CloudTasksClient.create()
     private final String queuePath = QueueName.of("trevorism-gcloud", "us-east1", "default").toString()
+    private String scheduleToken
+
+    DefaultScheduleService() {
+        try {
+            PropertiesProvider pp = new PropertiesProvider()
+            scheduleToken = pp.getProperty("scheduleToken")
+        } catch (Exception ignored) {
+            log.warning("Unable to get scheduleToken; new schedules will not be authenticated.")
+        }
+    }
 
     @Override
     ScheduledTask create(ScheduledTask schedule) {
@@ -103,7 +114,9 @@ class DefaultScheduleService implements ScheduleService {
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
-
+        if (scheduleToken) {
+            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken)
+        }
         if (schedule.httpMethod == "get") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.GET)
         } else if (schedule.httpMethod == "post") {
