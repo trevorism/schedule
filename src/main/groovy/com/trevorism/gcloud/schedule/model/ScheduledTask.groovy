@@ -12,7 +12,7 @@ class ScheduledTask {
     @ApiModelProperty(value = "Unique name of the task")
     String name
 
-    @ApiModelProperty(value = "The type of scheduling task", allowableValues = "daily,hourly,minute,progressive")
+    @ApiModelProperty(value = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
     String type
     @ApiModelProperty(value = "When the task will start")
     Date startDate

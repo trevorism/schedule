@@ -12,6 +12,7 @@ import com.trevorism.secure.PropertiesProvider
 
 import java.nio.charset.Charset
 import java.time.Instant
+import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
 /**
@@ -110,6 +111,10 @@ class DefaultScheduleService implements ScheduleService {
             schedule.enabled = false
             repository.update(schedule.id, schedule)
         }
+
+        //Every request creates a new client, therefore we can shut it down here.
+        client.shutdown()
+        client.awaitTermination(2, TimeUnit.SECONDS)
     }
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {

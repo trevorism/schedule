@@ -10,3 +10,7 @@ Schedule is a webapp that enables scheduled tasks.
 Current version: 0.4.0
 
 Deployed to [Schedule](https://schedule.datastore.trevorism.com/)
+
+Uses a rather ingenious way of scheduling which optimizes for cost on GCP. 
+The app keeps track of schedules as data, and enqueues them as Cloud Tasks by checking hourly if the tasks should be invoked within the next hour.
+
