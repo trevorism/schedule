@@ -24,8 +24,6 @@ class DefaultScheduleService implements ScheduleService {
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
-    private CloudTasksClient client = CloudTasksClient.create()
-    private final String queuePath = QueueName.of("trevorism-gcloud", "us-east1", "default").toString()
     private String scheduleToken
 
     DefaultScheduleService() {
@@ -104,7 +102,8 @@ class DefaultScheduleService implements ScheduleService {
         Task.Builder taskBuilder = Task.newBuilder()
                 .setScheduleTime(Timestamp.newBuilder().setSeconds(scheduleSeconds).build())
                 .setHttpRequest(httpRequest)
-
+        final CloudTasksClient client = CloudTasksClient.create()
+        final String queuePath = QueueName.of("trevorism-gcloud", "us-east1", "default").toString()
         Task task = client.createTask(queuePath, taskBuilder.build())
 
         if (task.name && scheduleType.name == "immediate") {
@@ -112,7 +111,6 @@ class DefaultScheduleService implements ScheduleService {
             repository.update(schedule.id, schedule)
         }
 
-        //Every request creates a new client, therefore we can shut it down here.
         client.shutdown()
         client.awaitTermination(2, TimeUnit.SECONDS)
     }
