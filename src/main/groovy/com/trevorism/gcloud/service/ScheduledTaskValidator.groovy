@@ -29,17 +29,17 @@ class ScheduledTaskValidator {
         try{
             (!scheduledTask.id) ?: Integer.parseInt(scheduledTask.id)
             if(!scheduledTask.name)
-                throw new Exception("Scheduled task must have a name")
+                throw new RuntimeException("Scheduled task must have a name")
             if(!allowDuplicate && service.getByName(scheduledTask.name)){
-                throw new Exception("Scheduled task already exists")
+                throw new RuntimeException("Scheduled task already exists")
             }
             if(!(["get","post","put","delete"].contains(scheduledTask.httpMethod)))
-                throw new Exception("Invalid http method")
+                throw new RuntimeException("Invalid http method")
             if(!scheduledTask.endpoint)
-                throw new Exception("Endpoint not specified")
+                throw new RuntimeException("Endpoint not specified")
 
         }catch (Exception e){
-            throw new BadRequestException("Error creating schedule: ${e.message}")
+            throw new RuntimeException("Error creating schedule: ${e.message}")
         }
     }
 }

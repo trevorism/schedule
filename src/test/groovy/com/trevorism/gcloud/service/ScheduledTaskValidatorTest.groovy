@@ -33,7 +33,7 @@ class ScheduledTaskValidatorTest {
         validator.validate(task, false)
     }
 
-    @Test(expected = BadRequestException)
+    @Test(expected = RuntimeException)
     void testValidate_InvalidNullName() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
@@ -44,7 +44,7 @@ class ScheduledTaskValidatorTest {
     }
 
 
-    @Test(expected = BadRequestException)
+    @Test(expected = RuntimeException)
     void testValidate_InvalidMatchingName() {
         def service = new TestScheduleService()
         service.create(TestScheduleService.createTestScheduledTaskNow())
@@ -56,7 +56,7 @@ class ScheduledTaskValidatorTest {
         validator.validate(task, false)
     }
 
-    @Test(expected = BadRequestException)
+    @Test(expected = RuntimeException)
     void testValidate_InvalidHttpMethod() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
@@ -66,7 +66,7 @@ class ScheduledTaskValidatorTest {
         validator.validate(task, false)
     }
 
-    @Test(expected = BadRequestException)
+    @Test(expected = RuntimeException)
     void testValidate_InvalidEndpoint() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 
@@ -75,7 +75,7 @@ class ScheduledTaskValidatorTest {
         validator.validate(task, false)
     }
 
-    @Test(expected = BadRequestException)
+    @Test(expected = RuntimeException)
     void testValidate_InvalidId() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
 

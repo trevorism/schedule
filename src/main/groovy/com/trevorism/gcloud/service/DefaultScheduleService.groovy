@@ -5,6 +5,8 @@ import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
+import com.trevorism.data.model.filtering.FilterBuilder
+import com.trevorism.data.model.filtering.SimpleFilter
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
@@ -46,9 +48,10 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     ScheduledTask getByName(String name) {
-        repository.list().find {
-            it.name == name
-        }
+        def task = repository.filter(new FilterBuilder().addFilter(new SimpleFilter("name", "=", name.toLowerCase())).build())
+        if (!task)
+            return null
+        return task[0]
     }
 
     @Override

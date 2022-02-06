@@ -1,6 +1,9 @@
 package com.trevorism.gcloud.service
 
 import com.trevorism.data.Repository
+import com.trevorism.data.model.filtering.ComplexFilter
+import com.trevorism.data.model.paging.PageRequest
+import com.trevorism.data.model.sorting.ComplexSort
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 
 /**
@@ -71,5 +74,22 @@ class TestRepository implements Repository<ScheduledTask> {
     @Override
     void ping() {
 
+    }
+
+    @Override
+    List<ScheduledTask> filter(ComplexFilter complexFilter) {
+        return list().findAll(){
+            it.name == complexFilter.simpleFilters[0].value
+        }
+    }
+
+    @Override
+    List<ScheduledTask> page(PageRequest pageRequest) {
+        return list()
+    }
+
+    @Override
+    List<ScheduledTask> sort(ComplexSort complexSort) {
+        return list()
     }
 }
