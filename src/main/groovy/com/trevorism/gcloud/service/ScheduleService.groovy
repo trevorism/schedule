@@ -15,4 +15,6 @@ interface ScheduleService {
 
     void enqueue(ScheduledTask schedule)
     boolean enqueueAll()
+
+    boolean cleanup()
 }

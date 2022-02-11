@@ -1,5 +1,6 @@
 package com.trevorism.gcloud.service
 
+import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
@@ -8,7 +9,6 @@ import org.junit.Test
 
 import java.time.Instant
 import java.time.temporal.ChronoUnit
-import java.time.temporal.TemporalUnit
 
 /**
  * @author tbrooks
@@ -62,6 +62,12 @@ class DefaultScheduleServiceTest {
         assert scheduleService.list().size() == 1
         assert scheduleService.getByName("test").enabled
         assert scheduleService.getByName("test").type == "hourly"
+    }
+
+
+    @Test
+    void testCleanup(){
+        assert !scheduleService.cleanup()
     }
 
     @Test

@@ -14,6 +14,7 @@ import com.trevorism.secure.PropertiesProvider
 
 import java.nio.charset.Charset
 import java.time.Instant
+import java.time.LocalDateTime
 import java.util.concurrent.TimeUnit
 import java.util.logging.Logger
 
@@ -94,6 +95,19 @@ class DefaultScheduleService implements ScheduleService {
             enqueue(st)
         }
         return list
+    }
+
+    @Override
+    boolean cleanup() {
+        def date = LocalDateTime.now().minusDays(1).toDate()
+        def list = repository.list()
+        def immediates = list.findAll{ it.type == "immediate" && it.startDate < date}
+
+        immediates.each {
+            delete(it.name)
+        }
+
+        return immediates
     }
 
     void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType) {

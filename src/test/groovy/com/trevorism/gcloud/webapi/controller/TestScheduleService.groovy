@@ -54,6 +54,11 @@ class TestScheduleService implements ScheduleService {
         return false
     }
 
+    @Override
+    boolean cleanup() {
+        return false
+    }
+
     static ScheduledTask createTestScheduledTaskNow() {
         new ScheduledTask(name: "test", type: "minute", startDate: ZonedDateTime.now().toDate(), enabled: false, requestJson: "{}",
                 endpoint:"https://ixips-waiter-eastus2-prod.azurewebsites.net/api/waiter/2")
