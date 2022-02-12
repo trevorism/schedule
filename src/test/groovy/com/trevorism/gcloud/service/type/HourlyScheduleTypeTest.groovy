@@ -17,6 +17,8 @@ class HourlyScheduleTypeTest {
     @Test
     void testGetCountdownMillis() {
         def type = new HourlyScheduleType()
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledTaskNow()) == -1
+        def task = TestScheduleService.createTestScheduledTaskNow()
+        Thread.sleep(100)
+        assert type.getCountdownMillis(task) == -1
     }
 }

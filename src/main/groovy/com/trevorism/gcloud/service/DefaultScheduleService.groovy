@@ -129,7 +129,7 @@ class DefaultScheduleService implements ScheduleService {
         }
 
         client.shutdown()
-        client.awaitTermination(2, TimeUnit.SECONDS)
+        client.awaitTermination(3, TimeUnit.SECONDS)
     }
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
