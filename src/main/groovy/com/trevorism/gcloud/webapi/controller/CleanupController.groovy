@@ -23,7 +23,7 @@ class CleanupController {
     @DELETE
     @Secure(value = Roles.SYSTEM, allowInternal = true)
     @Produces(MediaType.APPLICATION_JSON)
-    List<ScheduledTask> cleanup() {
+    boolean cleanup() {
         scheduleService.cleanup()
     }
 }
