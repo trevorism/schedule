@@ -57,8 +57,13 @@ class ScheduleController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask create(ScheduledTask schedule) {
-        ScheduledTask createdSchedule = scheduleService.create(schedule)
-        return createdSchedule
+        try {
+            ScheduledTask createdSchedule = scheduleService.create(schedule)
+            return createdSchedule
+        } catch (Exception e) {
+            log.severe("Unable to create scheduled task due to: ${e.message}")
+            throw new BadRequestException("Unable to create due to: ${e.message}")
+        }
     }
 
     @ApiOperation(value = "Update a ScheduledTask **Secure")
@@ -68,8 +73,13 @@ class ScheduleController {
     @Produces(MediaType.APPLICATION_JSON)
     @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask update(@PathParam("name") String name, ScheduledTask schedule) {
-        ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
-        return updatedSchedule
+        try {
+            ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
+            return updatedSchedule
+        } catch (Exception e) {
+            log.severe("Unable to update scheduled task due to: ${e.message}")
+            throw new BadRequestException("Unable to update due to: ${e.message}")
+        }
     }
 
     @ApiOperation(value = "Delete a ScheduledTask with the {name} **Secure")
