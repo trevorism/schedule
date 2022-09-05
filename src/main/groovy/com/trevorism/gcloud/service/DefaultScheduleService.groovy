@@ -153,15 +153,14 @@ class DefaultScheduleService implements ScheduleService {
         long nowMillis = Instant.now().toEpochMilli()
         long startDateMillis = scheduledTask.startDate.getTime()
         long scheduleTimeMillis = scheduleType.getCountdownMillis(scheduledTask)
-        long oneHourFromNow = 1000 * 60 * 60
 
         if (scheduleTimeMillis == ScheduleType.WILL_NEVER_ENQUEUE) {
             return false
         }
-        if (nowMillis + oneHourFromNow < startDateMillis) {
+        if (nowMillis + ScheduleType.HOURS_IN_MILLISECONDS < startDateMillis) {
             return false
         }
-        if (scheduleTimeMillis > oneHourFromNow) {
+        if (scheduleTimeMillis > ScheduleType.HOURS_IN_MILLISECONDS) {
             return false
         }
         return scheduledTask.enabled

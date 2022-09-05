@@ -7,11 +7,14 @@ import java.time.ZonedDateTime
 
 /**
  * @author tbrooks
+ * Immediate runs if at the start date,
+ * or immediately if the start date has already occurred
  */
 class ImmediateScheduleType implements ScheduleType{
+
     @Override
     String getName() {
-        return "immediate"
+        ScheduleTypeFactory.IMMEDIATE
     }
 
     @Override
@@ -23,7 +26,7 @@ class ImmediateScheduleType implements ScheduleType{
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
 
         long countdownTime = desiredTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
-        if(countdownTime > 0 && countdownTime < 1000 * 60 * 60){
+        if(countdownTime > 0 && countdownTime < HOURS_IN_MILLISECONDS){
             return countdownTime
         }
 

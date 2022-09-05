@@ -9,9 +9,10 @@ import java.time.ZonedDateTime
  * @author tbrooks
  */
 class HourlyScheduleType implements ScheduleType {
+
     @Override
     String getName() {
-        return "hourly"
+        ScheduleTypeFactory.HOURLY
     }
 
     @Override
@@ -23,6 +24,10 @@ class HourlyScheduleType implements ScheduleType {
         ZonedDateTime desiredTime = schedule.startDate.toInstant().atZone(ZoneId.of("UTC"))
         ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
         ZonedDateTime targetTime = ZonedDateTime.now(ZoneId.of("UTC")).withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
+
+        if(targetTime == now){
+            return 0
+        }
 
         if(targetTime.isBefore(now)){
             targetTime = targetTime.plusHours(1)
