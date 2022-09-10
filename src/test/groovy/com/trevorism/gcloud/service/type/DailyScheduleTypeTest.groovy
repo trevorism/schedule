@@ -33,7 +33,7 @@ class DailyScheduleTypeTest {
     void testSecondsLaterCase(){
         def type = new DailyScheduleType()
         long millis = type.getCountdownMillis(TestScheduleService.createTestScheduledLater())
-        assert millis <= 30000 && millis != -1
+        assert millis <= 30100 && millis != -1
     }
 
     @Test
