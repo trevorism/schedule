@@ -134,6 +134,7 @@ class DefaultScheduleService implements ScheduleService {
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
+        log.info("Temporary log: ${scheduleToken}")
         if (scheduleToken) {
             httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken)
         }
