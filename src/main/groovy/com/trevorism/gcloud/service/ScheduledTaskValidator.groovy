@@ -3,8 +3,6 @@ package com.trevorism.gcloud.service
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.http.util.CleanUrl
 
-import javax.ws.rs.BadRequestException
-
 /**
  * @author tbrooks
  */

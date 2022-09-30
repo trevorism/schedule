@@ -1,6 +1,5 @@
 package com.trevorism.gcloud.webapi.controller
 
-import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Roles
@@ -9,7 +8,6 @@ import io.swagger.annotations.Api
 import io.swagger.annotations.ApiOperation
 
 import javax.ws.rs.DELETE
-import javax.ws.rs.GET
 import javax.ws.rs.Path
 import javax.ws.rs.Produces
 import javax.ws.rs.core.MediaType

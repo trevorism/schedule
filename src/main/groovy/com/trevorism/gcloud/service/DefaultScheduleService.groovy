@@ -10,6 +10,7 @@ import com.trevorism.data.model.filtering.SimpleFilter
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
+import com.trevorism.secure.ClasspathBasedPropertiesProvider
 import com.trevorism.secure.PropertiesProvider
 
 import java.nio.charset.Charset
@@ -27,16 +28,6 @@ class DefaultScheduleService implements ScheduleService {
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
-    private String scheduleToken
-
-    DefaultScheduleService() {
-        try {
-            PropertiesProvider pp = new PropertiesProvider()
-            scheduleToken = pp.getProperty("scheduleToken")
-        } catch (Exception ignored) {
-            log.warning("Unable to get scheduleToken; new schedules will not be authenticated.")
-        }
-    }
 
     @Override
     ScheduledTask create(ScheduledTask schedule) {
@@ -134,6 +125,7 @@ class DefaultScheduleService implements ScheduleService {
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
+        String scheduleToken = getScheduleToken()
         if (scheduleToken) {
             httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken)
         }
@@ -164,5 +156,14 @@ class DefaultScheduleService implements ScheduleService {
             return false
         }
         return scheduledTask.enabled
+    }
+
+    private String getScheduleToken() {
+        try {
+            PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
+            return pp.getProperty("scheduleToken")
+        } catch (Exception ignored) {
+            log.warning("Unable to get scheduleToken; new schedules will not be authenticated.")
+        }
     }
 }

@@ -17,7 +17,6 @@ class RootControllerTest {
     void testRootControllerEndpoints(){
         RootController rootController = new RootController()
         assert rootController.displayHelpLink().contains("help")
-
     }
 
     @Test
@@ -26,13 +25,4 @@ class RootControllerTest {
         assert rootController.ping() == "pong"
     }
 
-    @Test
-    void testSchedule(){
-        ScheduleController scheduleController = new ScheduleController()
-        Date startDate = Instant.now().plusSeconds(30*60).toDate()
-        scheduleController.delete("test1")
-        scheduleController.list().each {
-            println "${it.name} ${it.startDate} ${it.enabled} ${it.httpMethod} ${it.endpoint} ${it.type}"
-        }
-    }
 }
