@@ -60,7 +60,7 @@ class DefaultScheduleServiceTest {
         ScheduledTask task = new ScheduledTask(name: "test", type: "hourly", startDate: new Date(), enabled: false, endpoint: "endpoint", requestJson: "{}")
         scheduleService.update(task, "test")
         assert scheduleService.list().size() == 1
-        assert scheduleService.getByName("test").enabled
+        assert !scheduleService.getByName("test").enabled
         assert scheduleService.getByName("test").type == "hourly"
     }
 
