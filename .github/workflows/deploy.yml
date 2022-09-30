@@ -48,6 +48,7 @@ jobs:
             Add-Content -Path .\build\staged-app\WEB-INF\classes\secrets.properties -Value 'clientSecret=${{ secrets.CLIENT_SECRET }}'
             Add-Content -Path .\build\staged-app\WEB-INF\classes\secrets.properties -Value 'signingKey=${{ secrets.SIGNING_KEY }}'
             Add-Content -Path .\build\staged-app\WEB-INF\classes\secrets.properties -Value 'scheduleToken=${{ secrets.SCHEDULE_TOKEN }}'
+            Add-Content -Path .\src\acceptance\resources\secrets.properties -Value 'scheduleToken=${{ secrets.SCHEDULE_TOKEN }}'
 
       - name: 'Deploy to App Engine'
         uses: 'google-github-actions/deploy-appengine@v0.8.0'
