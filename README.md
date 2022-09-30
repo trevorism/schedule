@@ -1,6 +1,5 @@
 # schedule 
-![Jenkins](https://img.shields.io/jenkins/build/http/trevorism-build.eastus.cloudapp.azure.com/schedule)
-![Jenkins Coverage](https://img.shields.io/jenkins/coverage/jacoco/http/trevorism-build.eastus.cloudapp.azure.com/schedule)
+![Build](https://github.com/trevorism/schedule/actions/workflows/deploy.yml/badge.svg)
 ![GitHub last commit](https://img.shields.io/github/last-commit/trevorism/schedule)
 ![GitHub language count](https://img.shields.io/github/languages/count/trevorism/schedule)
 ![GitHub top language](https://img.shields.io/github/languages/top/trevorism/schedule)
