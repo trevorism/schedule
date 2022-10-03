@@ -161,9 +161,9 @@ class DefaultScheduleService implements ScheduleService {
     private String getScheduleToken() {
         try {
             PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
-            return pp.getProperty("scheduleToken")
+            return pp.getProperty("token")
         } catch (Exception ignored) {
-            log.warning("Unable to get scheduleToken; new schedules will not be authenticated.")
+            log.warning("Unable to get token; new schedules will not be authenticated.")
         }
     }
 }
