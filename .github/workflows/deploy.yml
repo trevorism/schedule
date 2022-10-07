@@ -13,8 +13,8 @@ jobs:
     if: success() || failure()
     needs: [call-build, call-accept-before]
     with:
-      gcp_project: 'trevorism-gcloud'
-      gcp_project_id: '159773244195'
+      gcp_project: 'trevorism-action'
+      gcp_project_id: '846837196321'
       version: '0-9-0'
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
