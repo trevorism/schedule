@@ -111,7 +111,7 @@ class DefaultScheduleService implements ScheduleService {
                 .setScheduleTime(Timestamp.newBuilder().setSeconds(scheduleSeconds).build())
                 .setHttpRequest(httpRequest)
         final CloudTasksClient client = CloudTasksClient.create()
-        final String queuePath = QueueName.of("trevorism-gcloud", "us-east1", "default").toString()
+        final String queuePath = QueueName.of("trevorism-action", "us-east4", "default").toString()
         Task task = client.createTask(queuePath, taskBuilder.build())
 
         if (task.name && scheduleType.name == "immediate") {
