@@ -10,6 +10,7 @@ import com.trevorism.data.model.filtering.SimpleFilter
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
+import com.trevorism.http.headers.HeadersHttpClient
 import com.trevorism.secure.ClasspathBasedPropertiesProvider
 import com.trevorism.secure.PropertiesProvider
 
@@ -105,7 +106,10 @@ class DefaultScheduleService implements ScheduleService {
         long nowMillis = Instant.now().toEpochMilli()
         long scheduleSeconds = (nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000
 
-        HttpRequest httpRequest = constructHttpRequest(schedule)
+        String correlationId = UUID.randomUUID().toString()
+        log.info("${correlationId}: Enqueuing schedule ${schedule.name}")
+
+        HttpRequest httpRequest = constructHttpRequest(schedule, correlationId)
 
         Task.Builder taskBuilder = Task.newBuilder()
                 .setScheduleTime(Timestamp.newBuilder().setSeconds(scheduleSeconds).build())
@@ -123,11 +127,11 @@ class DefaultScheduleService implements ScheduleService {
         client.awaitTermination(3, TimeUnit.SECONDS)
     }
 
-    private HttpRequest constructHttpRequest(ScheduledTask schedule) {
+    private HttpRequest constructHttpRequest(ScheduledTask schedule, String correlationId) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
         String scheduleToken = getScheduleToken()
         if (scheduleToken) {
-            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken)
+            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken).putHeaders(HeadersHttpClient.CORRELATION_ID_HEADER_KEY, correlationId)
         }
         if (schedule.httpMethod == "get") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.GET)
