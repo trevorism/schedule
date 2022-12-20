@@ -108,7 +108,7 @@ class DefaultScheduleService implements ScheduleService {
 
         String correlationId = UUID.randomUUID().toString()
         log.info("Enqueuing schedule ${schedule.name} using correlationId: ${correlationId}")
-        log.info("Scheduled for ${scheduleSeconds} seconds from now using correlationId: ${correlationId}")
+        log.info("Scheduled for ${scheduleSeconds - (nowMillis/1000)} seconds from now using correlationId: ${correlationId}")
 
         HttpRequest httpRequest = constructHttpRequest(schedule, correlationId)
 
