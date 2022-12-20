@@ -107,7 +107,8 @@ class DefaultScheduleService implements ScheduleService {
         long scheduleSeconds = (nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000
 
         String correlationId = UUID.randomUUID().toString()
-        log.info("${correlationId}: Enqueuing schedule ${schedule.name}")
+        log.info("Enqueuing schedule ${schedule.name} using correlationId: ${correlationId}")
+        log.info("Scheduled for ${scheduleSeconds} seconds from now using correlationId: ${correlationId}")
 
         HttpRequest httpRequest = constructHttpRequest(schedule, correlationId)
 
@@ -120,6 +121,7 @@ class DefaultScheduleService implements ScheduleService {
 
         if (task.name && scheduleType.name == "immediate") {
             schedule.enabled = false
+            log.info("${correlationId}: Updating schedule to enabled=false since the schedule is already enqueued. This avoids accidental multiple invocations.")
             repository.update(schedule.id, schedule)
         }
 
