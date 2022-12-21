@@ -94,7 +94,7 @@ class DefaultScheduleService implements ScheduleService {
         def date = LocalDateTime.now().minusDays(1).toDate()
         def list = repository.list()
         def immediates = list.findAll{ it.type == "immediate" && it.startDate < date}
-
+        log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
             delete(it.name)
         }
