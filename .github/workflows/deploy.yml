@@ -8,15 +8,18 @@ on:
 jobs:
   call-build:
     uses: trevorism/actions-workflows/.github/workflows/build.yml@master
+    with:
+      JDK_VERSION: 17
 
   call-deploy:
     uses: trevorism/actions-workflows/.github/workflows/deploy.yml@master
     if: success() || failure()
     needs: [call-build, call-accept-before]
     with:
+      JDK_VERSION: 17
       gcp_project: 'trevorism-action'
       gcp_project_id: '846837196321'
-      version: '0-9-1'
+      version: '1-0-0'
     secrets:
       CLIENT_ID: ${{ secrets.CLIENT_ID }}
       CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
@@ -25,11 +28,15 @@ jobs:
 
   call-accept-before:
     uses: trevorism/actions-workflows/.github/workflows/accept.yml@master
+    with:
+      JDK_VERSION: 17
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
 
   call-accept-after:
     uses: trevorism/actions-workflows/.github/workflows/accept.yml@master
     needs: call-deploy
+    with:
+      JDK_VERSION: 17
     secrets:
       TOKEN: ${{ secrets.TOKEN }}

@@ -1,8 +1,8 @@
 package com.trevorism.gcloud.webapi.controller
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 /**
  * @author tbrooks
@@ -11,7 +11,7 @@ class ScheduleControllerTest {
 
     ScheduleController scheduleController = new ScheduleController()
 
-    @Before
+    @BeforeEach
     void setup(){
         scheduleController.scheduleService = new TestScheduleService()
         scheduleController.create(TestScheduleService.createTestScheduledTaskNow())

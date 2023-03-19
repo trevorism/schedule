@@ -10,22 +10,23 @@ import com.trevorism.data.model.filtering.SimpleFilter
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
-import com.trevorism.http.headers.HeadersHttpClient
-import com.trevorism.secure.ClasspathBasedPropertiesProvider
-import com.trevorism.secure.PropertiesProvider
+import com.trevorism.ClasspathBasedPropertiesProvider
+import com.trevorism.PropertiesProvider
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 import java.nio.charset.Charset
 import java.time.Instant
-import java.time.LocalDateTime
+import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
-import java.util.logging.Logger
+
 
 /**
  * @author tbrooks
  */
 class DefaultScheduleService implements ScheduleService {
 
-    private static final Logger log = Logger.getLogger(DefaultScheduleService.class.name)
+    private static final Logger log = LoggerFactory.getLogger( DefaultScheduleService )
 
     private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
@@ -91,7 +92,7 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     boolean cleanup() {
-        def date = LocalDateTime.now().minusDays(1).toDate()
+        def date = Date.from(ZonedDateTime.now().minusDays(1).toInstant())
         def list = repository.list()
         def immediates = list.findAll{ it.type == "immediate" && it.startDate < date}
         log.info("Number of old schedules to delete: ${immediates.size()}")
@@ -133,7 +134,7 @@ class DefaultScheduleService implements ScheduleService {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
         String scheduleToken = getScheduleToken()
         if (scheduleToken) {
-            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken).putHeaders(HeadersHttpClient.CORRELATION_ID_HEADER_KEY, correlationId)
+            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken).putHeaders("X-CorrelationId", correlationId)
         }
         if (schedule.httpMethod == "get") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.GET)
@@ -141,6 +142,8 @@ class DefaultScheduleService implements ScheduleService {
             httpBuilder = httpBuilder.setBody(ByteString.copyFrom(schedule.requestJson, Charset.defaultCharset())).setHttpMethod(HttpMethod.POST)
         } else if (schedule.httpMethod == "put") {
             httpBuilder = httpBuilder.setBody(ByteString.copyFrom(schedule.requestJson, Charset.defaultCharset())).setHttpMethod(HttpMethod.PUT)
+        } else if (schedule.httpMethod == "patch") {
+            httpBuilder = httpBuilder.setBody(ByteString.copyFrom(schedule.requestJson, Charset.defaultCharset())).setHttpMethod(HttpMethod.PATCH)
         } else if (schedule.httpMethod == "delete") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.DELETE)
         }
@@ -169,7 +172,7 @@ class DefaultScheduleService implements ScheduleService {
             PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
             return pp.getProperty("token")
         } catch (Exception ignored) {
-            log.warning("Unable to get token; new schedules will not be authenticated.")
+            log.warn("Unable to get token; new schedules will not be authenticated.")
         }
     }
 }

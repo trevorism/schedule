@@ -1,21 +1,20 @@
 package com.trevorism.gcloud
 
-import com.trevorism.http.headers.HeadersHttpClient
-import com.trevorism.http.headers.HeadersJsonHttpClient
-import com.trevorism.http.util.ResponseUtils
-import com.trevorism.secure.ClasspathBasedPropertiesProvider
-import com.trevorism.secure.PropertiesProvider
+import com.trevorism.http.HttpClient
+import com.trevorism.http.JsonHttpClient
+import com.trevorism.ClasspathBasedPropertiesProvider
+import com.trevorism.PropertiesProvider
 
-this.metaClass.mixin(cucumber.api.groovy.Hooks)
-this.metaClass.mixin(cucumber.api.groovy.EN)
+this.metaClass.mixin(io.cucumber.groovy.Hooks)
+this.metaClass.mixin(io.cucumber.groovy.EN)
 
 PropertiesProvider propertiesProvider = new ClasspathBasedPropertiesProvider()
-HeadersHttpClient jsonHttpClient = new HeadersJsonHttpClient()
+HttpClient jsonHttpClient = new JsonHttpClient()
 def response = ""
 
 When(/the endpoint tester internal endpoint is invoked/) { ->
     def token = propertiesProvider.getProperty("token")
-    response = ResponseUtils.getEntity(jsonHttpClient.get("https://endpoint-tester.testing.trevorism.com/secure/internal", ["Authorization": "bearer $token".toString()]))
+    response = jsonHttpClient.get("https://endpoint-tester.testing.trevorism.com/secure/internal", ["Authorization": "bearer $token".toString()]).value
 }
 
 Then(/a response is returned successfully/) { ->

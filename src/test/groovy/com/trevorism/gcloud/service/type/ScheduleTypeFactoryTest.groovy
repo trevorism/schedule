@@ -1,11 +1,12 @@
 package com.trevorism.gcloud.service.type
 
-import org.junit.Test
+import org.junit.jupiter.api.Test
 
 /**
  * @author tbrooks
  */
 class ScheduleTypeFactoryTest {
+
     @Test
     void testCreate() {
         assert ScheduleTypeFactory.create("daily") instanceof DailyScheduleType

@@ -4,11 +4,10 @@ import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
-import org.junit.Before
-import org.junit.Test
+import org.junit.jupiter.api.BeforeEach
+import org.junit.jupiter.api.Test
 
 import java.time.Instant
-import java.time.LocalDateTime
 import java.time.temporal.ChronoUnit
 
 /**
@@ -19,7 +18,7 @@ class DefaultScheduleServiceTest {
     DefaultScheduleService scheduleService = new DefaultScheduleService()
     private int addedToQueue = 0
 
-    @Before
+    @BeforeEach
     void setup() {
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
@@ -73,64 +72,64 @@ class DefaultScheduleServiceTest {
 
     @Test
     void testShouldBeEnqueuedDaily() {
-        ScheduledTask task1 = createTestTask("daily", Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60).toDate())
+        ScheduledTask task1 = createTestTask("daily", Date.from(Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task1, ScheduleTypeFactory.create(task1.type))
 
-        ScheduledTask task2 = createTestTask("daily", Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task2 = createTestTask("daily", Date.from(Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task2, ScheduleTypeFactory.create(task2.type))
 
-        ScheduledTask task3 = createTestTask("daily", Instant.now().minusSeconds(30 * 60).toDate())
+        ScheduledTask task3 = createTestTask("daily", Date.from(Instant.now().minusSeconds(30 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task3, ScheduleTypeFactory.create(task3.type))
 
-        ScheduledTask task4 = createTestTask("daily", Instant.now().plusSeconds(30 * 60).toDate())
+        ScheduledTask task4 = createTestTask("daily", Date.from(Instant.now().plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task4, ScheduleTypeFactory.create(task4.type))
 
-        ScheduledTask task5 = createTestTask("daily", Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task5 = createTestTask("daily", Date.from(Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task5, ScheduleTypeFactory.create(task5.type))
 
-        ScheduledTask task6 = createTestTask("daily", Instant.now().plusSeconds(90 * 60).toDate())
+        ScheduledTask task6 = createTestTask("daily", Date.from(Instant.now().plusSeconds(90 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task6, ScheduleTypeFactory.create(task6.type))
     }
 
     @Test
     void testShouldBeEnqueuedHourly() {
-        ScheduledTask task1 = createTestTask("hourly", Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60).toDate())
+        ScheduledTask task1 = createTestTask("hourly", Date.from(Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task1, ScheduleTypeFactory.create(task1.type))
 
-        ScheduledTask task2 = createTestTask("hourly", Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task2 = createTestTask("hourly", Date.from(Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task2, ScheduleTypeFactory.create(task2.type))
 
-        ScheduledTask task3 = createTestTask("hourly", Instant.now().minusSeconds(30 * 60).toDate())
+        ScheduledTask task3 = createTestTask("hourly", Date.from(Instant.now().minusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task3, ScheduleTypeFactory.create(task3.type))
 
-        ScheduledTask task4 = createTestTask("hourly", Instant.now().plusSeconds(30 * 60).toDate())
+        ScheduledTask task4 = createTestTask("hourly", Date.from(Instant.now().plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task4, ScheduleTypeFactory.create(task4.type))
 
-        ScheduledTask task5 = createTestTask("hourly", Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task5 = createTestTask("hourly", Date.from(Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task5, ScheduleTypeFactory.create(task5.type))
 
-        ScheduledTask task6 = createTestTask("hourly", Instant.now().plusSeconds(90 * 60).toDate())
+        ScheduledTask task6 = createTestTask("hourly", Date.from(Instant.now().plusSeconds(90 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task6, ScheduleTypeFactory.create(task6.type))
     }
 
     @Test
     void testShouldBeEnqueuedImmediate() {
-        ScheduledTask task1 = createTestTask(null, Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60).toDate())
+        ScheduledTask task1 = createTestTask(null, Date.from(Instant.now().minus(4, ChronoUnit.DAYS).minusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task1, ScheduleTypeFactory.create(task1.type))
 
-        ScheduledTask task2 = createTestTask(null, Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task2 = createTestTask(null, Date.from(Instant.now().minus(4, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task2, ScheduleTypeFactory.create(task2.type))
 
-        ScheduledTask task3 = createTestTask("blah", Instant.now().minusSeconds(30 * 60).toDate())
+        ScheduledTask task3 = createTestTask("blah", Date.from(Instant.now().minusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task3, ScheduleTypeFactory.create(task3.type))
 
-        ScheduledTask task4 = createTestTask("immediate", Instant.now().plusSeconds(30 * 60).toDate())
+        ScheduledTask task4 = createTestTask("immediate", Date.from(Instant.now().plusSeconds(30 * 60)))
         assert DefaultScheduleService.shouldBeEnqueued(task4, ScheduleTypeFactory.create(task4.type))
 
-        ScheduledTask task5 = createTestTask(null, Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60).toDate())
+        ScheduledTask task5 = createTestTask(null, Date.from(Instant.now().plus(1, ChronoUnit.DAYS).plusSeconds(30 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task5, ScheduleTypeFactory.create(task5.type))
 
-        ScheduledTask task6 = createTestTask("immed", Instant.now().plusSeconds(90 * 60).toDate())
+        ScheduledTask task6 = createTestTask("immed", Date.from(Instant.now().plusSeconds(90 * 60)))
         assert !DefaultScheduleService.shouldBeEnqueued(task6, ScheduleTypeFactory.create(task6.type))
     }
 

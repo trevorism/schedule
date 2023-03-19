@@ -4,24 +4,22 @@ import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
 
-import javax.ws.rs.DELETE
-import javax.ws.rs.Path
-import javax.ws.rs.Produces
-import javax.ws.rs.core.MediaType
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 
-@Api("Cleanup Operations")
-@Path("/cleanup")
+
+@Controller("/cleanup")
 class CleanupController {
 
     private ScheduleService scheduleService = new DefaultScheduleService()
 
-    @ApiOperation(value = "Cleanup expired immediate schedules")
-    @DELETE
+    @Tag(name = "Cleanup Operations")
+    @Operation(summary = "Cleanup expired immediate schedules")
+    @Delete(value = "/", produces = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.SYSTEM, allowInternal = true)
-    @Produces(MediaType.APPLICATION_JSON)
     boolean cleanup() {
         scheduleService.cleanup()
     }

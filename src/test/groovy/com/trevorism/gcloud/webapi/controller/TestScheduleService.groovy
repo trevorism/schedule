@@ -61,17 +61,17 @@ class TestScheduleService implements ScheduleService {
     }
 
     static ScheduledTask createTestScheduledTaskNow() {
-        new ScheduledTask(name: "test", type: "minute", startDate: ZonedDateTime.now(ZoneOffset.UTC).toDate(), enabled: false, requestJson: "{}",
+        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 
     static ScheduledTask createTestScheduledEarlier() {
-        new ScheduledTask(name: "test", type: "minute", startDate: ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(60*30).toDate(), enabled: false, requestJson: "{}",
+        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(60*30).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 
     static ScheduledTask createTestScheduledLater() {
-        new ScheduledTask(name: "test", type: "minute", startDate: ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30).toDate(), enabled: false, requestJson: "{}",
+        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 }

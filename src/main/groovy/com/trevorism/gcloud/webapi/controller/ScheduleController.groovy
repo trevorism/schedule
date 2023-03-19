@@ -5,90 +5,76 @@ import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
-import io.swagger.annotations.Api
-import io.swagger.annotations.ApiOperation
+import io.micronaut.http.MediaType
+import io.micronaut.http.annotation.*
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
-import javax.ws.rs.*
-import javax.ws.rs.core.MediaType
-import java.util.logging.Logger
-
-/**
- * @author tbrooks
- */
-@Api("Schedule Operations")
-@Path("/api")
+@Controller("/api")
 class ScheduleController {
 
-    private static final Logger log = Logger.getLogger(ScheduleController.class.name)
+    private static final Logger log = LoggerFactory.getLogger(ScheduleController.class.name)
     private ScheduleService scheduleService = new DefaultScheduleService()
 
-    @ApiOperation(value = "Enqueue all tasks")
-    @GET
-    @Path("enqueueAll")
-    @Produces(MediaType.APPLICATION_JSON)
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "Enqueue all tasks")
+    @Get(value = "enqueueAll", produces = MediaType.APPLICATION_JSON)
     boolean enqueueAll() {
         log.info("Enqueue all scheduled tasks")
         scheduleService.enqueueAll()
     }
 
-    @ApiOperation(value = "Get a list of all ScheduledTasks **Secure")
-    @GET
-    @Path("schedule")
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "Get a list of all ScheduledTasks **Secure")
+    @Get(value = "schedule", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    @Produces(MediaType.APPLICATION_JSON)
     List<ScheduledTask> list() {
         scheduleService.list()
     }
 
-    @ApiOperation(value = "View a ScheduledTask with the {name} **Secure")
-    @GET
-    @Path("schedule/{name}")
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "View a ScheduledTask with the {name} **Secure")
+    @Get(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    ScheduledTask get(@PathParam("name") String name) {
+    ScheduledTask get(String name) {
         scheduleService.getByName(name)
     }
 
-    @ApiOperation(value = "Create a new ScheduledTask **Secure")
-    @POST
-    @Path("schedule")
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "Create a new ScheduledTask **Secure")
+    @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(Roles.SYSTEM)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
     ScheduledTask create(ScheduledTask schedule) {
         try {
             ScheduledTask createdSchedule = scheduleService.create(schedule)
             return createdSchedule
         } catch (Exception e) {
-            log.severe("Unable to create scheduled task due to: ${e.message}")
-            throw new BadRequestException("Unable to create due to: ${e.message}")
+            log.error("Unable to create scheduled task", e)
+            throw new RuntimeException("Unable to create due to: ${e.message}")
         }
     }
 
-    @ApiOperation(value = "Update a ScheduledTask **Secure")
-    @PUT
-    @Path("schedule/{name}")
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "Update a ScheduledTask **Secure")
+    @Put(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(Roles.SYSTEM)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    ScheduledTask update(@PathParam("name") String name, ScheduledTask schedule) {
+    ScheduledTask update(String name, ScheduledTask schedule) {
         try {
             ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
             return updatedSchedule
         } catch (Exception e) {
-            log.severe("Unable to update scheduled task due to: ${e.message}")
-            throw new BadRequestException("Unable to update due to: ${e.message}")
+            log.error("Unable to update scheduled task", e)
+            throw new RuntimeException("Unable to update due to: ${e.message}")
         }
     }
 
-    @ApiOperation(value = "Delete a ScheduledTask with the {name} **Secure")
-    @DELETE
+    @Tag(name = "Schedule Operations")
+    @Operation(summary = "Delete a ScheduledTask with the {name} **Secure")
+    @Delete(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.SYSTEM)
-    @Path("schedule/{name}")
-    @Produces(MediaType.APPLICATION_JSON)
-    @Consumes(MediaType.APPLICATION_JSON)
-    boolean delete(@PathParam("name") String name) {
+    boolean delete(String name) {
         scheduleService.delete(name)
     }
 

@@ -1,29 +1,30 @@
 package com.trevorism.gcloud.schedule.model
 
-import io.swagger.annotations.ApiModelProperty
+import io.swagger.v3.oas.annotations.media.Schema
+
 
 /**
  * @author tbrooks
  */
 class ScheduledTask {
 
-    @ApiModelProperty(value = "An id value", dataType = "string", allowableValues = "range[1,2147483647]")
+    @Schema(description = "An id value", type = "String", allowableValues = "range[1,2147483647]")
     String id
-    @ApiModelProperty(value = "Unique name of the task")
+    @Schema(description = "Unique name of the task")
     String name
 
-    @ApiModelProperty(value = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
+    @Schema(description = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
     String type
-    @ApiModelProperty(value = "When the task will start")
+    @Schema(description = "When the task will start")
     Date startDate
-    @ApiModelProperty(value = "Is this task enabled?")
+    @Schema(description = "Is this task enabled?")
     boolean enabled
 
-    @ApiModelProperty(value = "Endpoint for the task")
+    @Schema(description = "Endpoint for the task")
     String endpoint
-    @ApiModelProperty(value = "HTTP Method for the task", allowableValues = "get,post,put,delete")
+    @Schema(description = "HTTP Method for the task", allowableValues = "get,post,put,patch,delete")
     String httpMethod = "post"
 
-    @ApiModelProperty(value = "For POST and PUT, the request body", allowableValues = "get,post,put,delete")
+    @Schema(description = "For POST, PUT, and PATCH the request body", allowableValues = "get,post,put,patch,delete")
     String requestJson
 }

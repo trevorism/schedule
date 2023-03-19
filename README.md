@@ -6,7 +6,7 @@
 
 Schedule is a webapp that enables scheduled tasks.
 
-Current version: 0.9.1
+Current version: 1.0.0
 
 Deployed to [Schedule](https://schedule.action.trevorism.com/)
 
