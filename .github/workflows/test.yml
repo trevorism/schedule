@@ -7,7 +7,9 @@ on:
         required: false
         type: string
         default: acceptance
-        description: Either 'unit' or 'acceptance'
+        description: Either 'unit' or 'acceptance' or 'cypress'
+
+permissions: write-all
 
 jobs:
   call-build:
@@ -21,5 +23,7 @@ jobs:
     uses: trevorism/actions-workflows/.github/workflows/accept.yml@master
     with:
       JDK_VERSION: 17
-    secrets:
-      TOKEN: ${{ secrets.TOKEN }}
+
+  call-cypress:
+    if: ${{inputs.TEST_TYPE == 'cypress'}}
+    uses: trevorism/actions-workflows/.github/workflows/cypress.yml@master

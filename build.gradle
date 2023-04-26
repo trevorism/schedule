@@ -17,14 +17,14 @@ buildscript {
     }
     dependencies {
         classpath 'com.google.cloud.tools:appengine-gradle-plugin:2.4.5'
-        classpath 'com.trevorism:gradle-acceptance-plugin:2.2.0'
+        classpath 'com.trevorism:gradle-acceptance-plugin:2.3.1'
     }
 }
 
 plugins {
     id "groovy"
-    id("com.github.johnrengelman.shadow") version "7.1.2"
-    id("io.micronaut.application") version "3.6.7"
+    id("com.github.johnrengelman.shadow") version "8.1.1"
+    id("io.micronaut.application") version "3.7.8"
     id "jacoco"
 }
 
@@ -58,8 +58,8 @@ dependencies {
     implementation 'com.google.cloud:google-cloud-tasks:2.13.0'
 
     implementation 'com.trevorism:datastore-client:2.8.0'
-    implementation 'com.trevorism:micronaut-security-utils:0.3.0'
-    implementation 'com.trevorism:http-utils:2.0.0'
+    implementation 'com.trevorism:micronaut-security-utils:0.5.0'
+    implementation 'com.trevorism:http-utils:2.1.0'
 
     acceptanceImplementation 'io.cucumber:cucumber-groovy:6.10.4'
 }
@@ -87,7 +87,7 @@ appengine {
     stage.artifact = "${buildDir}/libs/${project.name}-all.jar"
     deploy {
         projectId = "trevorism-action"
-        version = "1-0-0"
+        version = "1-1-0"
         stopPreviousVersion = true
         promote = true
     }

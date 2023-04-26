@@ -1,6 +1,6 @@
 micronaut:
   application:
-    name: threshold
+    name: schedule
   server:
     http-to-https-redirect: true
   security:

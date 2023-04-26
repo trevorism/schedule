@@ -1,5 +1,6 @@
 package com.trevorism.gcloud.schedule.model
 
+import com.fasterxml.jackson.annotation.JsonFormat
 import io.swagger.v3.oas.annotations.media.Schema
 
 
@@ -16,6 +17,7 @@ class ScheduledTask {
     @Schema(description = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
     String type
     @Schema(description = "When the task will start")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
     Date startDate
     @Schema(description = "Is this task enabled?")
     boolean enabled

@@ -1,3 +1,7 @@
+## 1.1.0
+
+Fix issue with date serialization.
+
 ## 1.0.0
 
 Upgrade to java 17, micronaut.
