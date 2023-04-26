@@ -17,7 +17,7 @@ class ScheduledTask {
     @Schema(description = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
     String type
     @Schema(description = "When the task will start")
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss")
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
     Date startDate
     @Schema(description = "Is this task enabled?")
     boolean enabled
