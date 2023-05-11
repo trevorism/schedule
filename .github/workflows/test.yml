@@ -25,7 +25,7 @@ jobs:
       JDK_VERSION: 17
     secrets:
       TOKEN: ${{ secrets.TOKEN }}
-      
+
   call-cypress:
     if: ${{inputs.TEST_TYPE == 'cypress'}}
     uses: trevorism/actions-workflows/.github/workflows/cypress.yml@master
