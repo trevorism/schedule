@@ -33,7 +33,7 @@ class DefaultScheduleService implements ScheduleService {
 
 
     DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider){
-        repository  = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
+        repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
     }
 
