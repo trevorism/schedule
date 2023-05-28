@@ -19,20 +19,10 @@ class TestRepository implements Repository<ScheduledTask> {
     }
 
     @Override
-    List<ScheduledTask> list(String s) {
-        list()
-    }
-
-    @Override
     ScheduledTask get(String id) {
         tasks.find{
             it.id == id
         }
-    }
-
-    @Override
-    ScheduledTask get(String s, String s1) {
-        get(s)
     }
 
     @Override
@@ -42,18 +32,9 @@ class TestRepository implements Repository<ScheduledTask> {
         return scheduledTask
     }
 
-    @Override
-    ScheduledTask create(ScheduledTask scheduledTask, String s) {
-        create(scheduledTask)
-    }
 
     @Override
     ScheduledTask update(String s, ScheduledTask scheduledTask) {
-        update(s, scheduledTask, null)
-    }
-
-    @Override
-    ScheduledTask update(String s, ScheduledTask scheduledTask, String s1) {
         tasks.remove(get(s))
         create(scheduledTask)
         return scheduledTask
@@ -64,11 +45,6 @@ class TestRepository implements Repository<ScheduledTask> {
         ScheduledTask task = get(id)
         tasks.remove(task)
         return task
-    }
-
-    @Override
-    ScheduledTask delete(String s, String s1) {
-        delete(s)
     }
 
     @Override

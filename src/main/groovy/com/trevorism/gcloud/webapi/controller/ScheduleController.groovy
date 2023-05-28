@@ -16,7 +16,7 @@ import org.slf4j.LoggerFactory
 class ScheduleController {
 
     private static final Logger log = LoggerFactory.getLogger(ScheduleController.class.name)
-    private ScheduleService scheduleService = new DefaultScheduleService()
+    private ScheduleService scheduleService
 
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Enqueue all tasks")
@@ -45,7 +45,7 @@ class ScheduleController {
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Create a new ScheduledTask **Secure")
     @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-    @Secure(Roles.SYSTEM)
+    @Secure(Roles.USER)
     ScheduledTask create(ScheduledTask schedule) {
         try {
             ScheduledTask createdSchedule = scheduleService.create(schedule)
@@ -59,7 +59,7 @@ class ScheduleController {
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Update a ScheduledTask **Secure")
     @Put(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-    @Secure(Roles.SYSTEM)
+    @Secure(Roles.USER)
     ScheduledTask update(String name, ScheduledTask schedule) {
         try {
             ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
@@ -73,7 +73,7 @@ class ScheduleController {
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Delete a ScheduledTask with the {name} **Secure")
     @Delete(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
-    @Secure(Roles.SYSTEM)
+    @Secure(Roles.USER)
     boolean delete(String name) {
         scheduleService.delete(name)
     }

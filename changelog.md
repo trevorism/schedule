@@ -1,3 +1,7 @@
+## 1.2.0
+
+Fix issue with date serialization.
+
 ## 1.1.0
 
 Fix issue with date serialization.

@@ -3,6 +3,7 @@ package com.trevorism.gcloud.service
 import com.google.cloud.tasks.v2beta3.*
 import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
+import com.trevorism.bean.CorrelationIdProvider
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
 import com.trevorism.data.model.filtering.FilterBuilder
@@ -12,6 +13,7 @@ import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.ClasspathBasedPropertiesProvider
 import com.trevorism.PropertiesProvider
+import com.trevorism.https.SecureHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -20,16 +22,20 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-
-/**
- * @author tbrooks
- */
+@jakarta.inject.Singleton
 class DefaultScheduleService implements ScheduleService {
 
     private static final Logger log = LoggerFactory.getLogger( DefaultScheduleService )
 
-    private Repository<ScheduledTask> repository = new PingingDatastoreRepository<>(ScheduledTask)
+    private Repository<ScheduledTask> repository
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
+    private CorrelationIdProvider provider
+
+
+    DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider){
+        repository  = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
+        this.provider = provider
+    }
 
     @Override
     ScheduledTask create(ScheduledTask schedule) {
@@ -111,7 +117,7 @@ class DefaultScheduleService implements ScheduleService {
         log.info("Enqueuing schedule ${schedule.name} using correlationId: ${correlationId}")
         log.info("Scheduled for ${scheduleSeconds - (nowMillis/1000)} seconds from now using correlationId: ${correlationId}")
 
-        HttpRequest httpRequest = constructHttpRequest(schedule, correlationId)
+        HttpRequest httpRequest = constructHttpRequest(schedule)
 
         Task.Builder taskBuilder = Task.newBuilder()
                 .setScheduleTime(Timestamp.newBuilder().setSeconds(scheduleSeconds).build())
@@ -130,11 +136,11 @@ class DefaultScheduleService implements ScheduleService {
         client.awaitTermination(3, TimeUnit.SECONDS)
     }
 
-    private HttpRequest constructHttpRequest(ScheduledTask schedule, String correlationId) {
+    private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
         String scheduleToken = getScheduleToken()
         if (scheduleToken) {
-            httpBuilder = httpBuilder.putHeaders("Authorization", "bearer " + scheduleToken).putHeaders("X-CorrelationId", correlationId)
+            httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken).putHeaders(CorrelationIdProvider.X_CORRELATION_ID, provider.getCorrelationId())
         }
         if (schedule.httpMethod == "get") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.GET)

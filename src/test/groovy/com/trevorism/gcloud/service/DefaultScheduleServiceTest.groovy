@@ -1,9 +1,11 @@
 package com.trevorism.gcloud.service
 
+import com.trevorism.bean.CorrelationIdProvider
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
+import com.trevorism.https.SecureHttpClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -15,11 +17,12 @@ import java.time.temporal.ChronoUnit
  */
 class DefaultScheduleServiceTest {
 
-    DefaultScheduleService scheduleService = new DefaultScheduleService()
+    DefaultScheduleService scheduleService
     private int addedToQueue = 0
 
     @BeforeEach
     void setup() {
+        scheduleService = new DefaultScheduleService([get: { String s -> return "pong"}] as SecureHttpClient, new CorrelationIdProvider())
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
         scheduleService.create(TestScheduleService.createTestScheduledTaskNow())
