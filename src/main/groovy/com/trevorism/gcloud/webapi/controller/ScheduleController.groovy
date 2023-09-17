@@ -47,7 +47,7 @@ class ScheduleController {
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Create a new ScheduledTask **Secure")
     @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
-    @Secure(Roles.USER)
+    @Secure(value = Roles.USER, allowInternal = true)
     ScheduledTask create(ScheduledTask schedule) {
         try {
             ScheduledTask createdSchedule = scheduleService.create(schedule)
