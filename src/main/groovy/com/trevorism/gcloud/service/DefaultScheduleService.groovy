@@ -2,6 +2,7 @@ package com.trevorism.gcloud.service
 
 import com.google.cloud.tasks.v2beta3.*
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
 import com.trevorism.bean.CorrelationIdProvider
@@ -22,6 +23,9 @@ import org.slf4j.LoggerFactory
 
 import java.nio.charset.Charset
 import java.time.Instant
+import java.time.LocalDateTime
+import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
@@ -181,12 +185,10 @@ class DefaultScheduleService implements ScheduleService {
 
     private String getScheduleToken(ScheduledTask scheduledTask) {
         try {
-            Date twoHoursFromNow = Date.from(Instant.now().plus(2, ChronoUnit.HOURS))
             PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
             String subject = pp.getProperty("clientId")
-            Gson gson = new Gson()
-            InternalTokenRequest tokenRequest = new InternalTokenRequest(expiration: twoHoursFromNow, subject: subject, tenantId: scheduledTask.tenantId)
-            return secureHttpClient.post("https://auth.trevorism.com/token/internal", gson.toJson(tokenRequest))
+            InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: scheduledTask.tenantId)
+            return secureHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }

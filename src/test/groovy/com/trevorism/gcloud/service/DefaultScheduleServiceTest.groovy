@@ -5,6 +5,7 @@ import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
+import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -140,4 +141,5 @@ class DefaultScheduleServiceTest {
         ScheduledTask task = new ScheduledTask(name: "test", type: daily, startDate: startDate, enabled: true, endpoint: "endpoint", requestJson: "{}")
         task
     }
+    
 }
