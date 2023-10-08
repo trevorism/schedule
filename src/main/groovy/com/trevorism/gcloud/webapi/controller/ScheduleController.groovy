@@ -1,7 +1,6 @@
 package com.trevorism.gcloud.webapi.controller
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
-import com.trevorism.gcloud.service.DefaultScheduleService
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure

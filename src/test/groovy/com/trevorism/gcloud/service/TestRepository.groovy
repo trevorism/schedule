@@ -14,6 +14,11 @@ class TestRepository implements Repository<ScheduledTask> {
     List<ScheduledTask> tasks = []
 
     @Override
+    List<ScheduledTask> all() {
+        tasks
+    }
+
+    @Override
     List<ScheduledTask> list() {
         tasks
     }

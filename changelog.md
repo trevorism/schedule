@@ -1,3 +1,8 @@
+## 1.3.0
+
+Enable multi-tenancy by allowing enqueued schedules 
+to request an internal token in order to authenticate with other services.
+
 ## 1.2.0
 
 Fix issue with date serialization.

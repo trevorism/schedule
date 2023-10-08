@@ -57,7 +57,7 @@ dependencies {
 
     implementation 'com.google.cloud:google-cloud-tasks:2.18.0'
     implementation 'com.trevorism:micronaut-utility-beans:0.1.0'
-    implementation 'com.trevorism:datastore-client:3.1.0'
+    implementation 'com.trevorism:datastore-client:3.2.0'
 
     acceptanceImplementation 'io.cucumber:cucumber-groovy:6.10.4'
 }
@@ -85,7 +85,7 @@ appengine {
     stage.artifact = "${buildDir}/libs/${project.name}-all.jar"
     deploy {
         projectId = "trevorism-action"
-        version = "1-2-0"
+        version = "1-3-0"
         stopPreviousVersion = true
         promote = true
     }

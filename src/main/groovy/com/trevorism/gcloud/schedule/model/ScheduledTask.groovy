@@ -29,4 +29,7 @@ class ScheduledTask {
 
     @Schema(description = "For POST, PUT, and PATCH the request body", allowableValues = "get,post,put,patch,delete")
     String requestJson
+
+    @Schema(description = "The tenantId of the schedule", type = "String")
+    String tenantId
 }

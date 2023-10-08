@@ -1,6 +1,7 @@
 package com.trevorism.gcloud.service
 
 import com.google.cloud.tasks.v2beta3.*
+import com.google.gson.Gson
 import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
 import com.trevorism.bean.CorrelationIdProvider
@@ -8,6 +9,7 @@ import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
 import com.trevorism.data.model.filtering.FilterBuilder
 import com.trevorism.data.model.filtering.SimpleFilter
+import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
@@ -20,6 +22,7 @@ import org.slf4j.LoggerFactory
 import java.nio.charset.Charset
 import java.time.Instant
 import java.time.ZonedDateTime
+import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
 @jakarta.inject.Singleton
@@ -30,9 +33,10 @@ class DefaultScheduleService implements ScheduleService {
     private Repository<ScheduledTask> repository
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
     private CorrelationIdProvider provider
-
+    private SecureHttpClient secureHttpClient
 
     DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider){
+        this.secureHttpClient = secureHttpClient;
         repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
     }
@@ -89,7 +93,7 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     boolean enqueueAll() {
-        def list = repository.list()
+        def list = repository.all()
         list.each { ScheduledTask st ->
             enqueue(st)
         }
@@ -138,7 +142,7 @@ class DefaultScheduleService implements ScheduleService {
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
-        String scheduleToken = getScheduleToken()
+        String scheduleToken = getScheduleToken(schedule)
         if (scheduleToken) {
             httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken).putHeaders(CorrelationIdProvider.X_CORRELATION_ID, provider.getCorrelationId())
         }
@@ -173,10 +177,14 @@ class DefaultScheduleService implements ScheduleService {
         return scheduledTask.enabled
     }
 
-    private String getScheduleToken() {
+    private String getScheduleToken(ScheduledTask scheduledTask) {
         try {
+            Date twoHoursFromNow = Date.from(Instant.now().plus(2, ChronoUnit.HOURS))
             PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
-            return pp.getProperty("token")
+            String subject = pp.getProperty("clientId")
+            Gson gson = new Gson()
+            InternalTokenRequest tokenRequest = new InternalTokenRequest(expiration: twoHoursFromNow, subject: subject, tenantId: scheduledTask.tenantId)
+            return secureHttpClient.post("https://auth.trevorism.com/token/internal", gson.toJson(tokenRequest))
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }
