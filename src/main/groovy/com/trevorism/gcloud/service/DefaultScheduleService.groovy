@@ -109,7 +109,7 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     boolean cleanup() {
         def date = Date.from(ZonedDateTime.now().minusDays(1).toInstant())
-        def list = repository.list()
+        def list = repository.all()
         def immediates = list.findAll{ it.type == "immediate" && it.startDate < date}
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {

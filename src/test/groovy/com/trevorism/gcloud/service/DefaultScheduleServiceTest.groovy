@@ -141,5 +141,5 @@ class DefaultScheduleServiceTest {
         ScheduledTask task = new ScheduledTask(name: "test", type: daily, startDate: startDate, enabled: true, endpoint: "endpoint", requestJson: "{}")
         task
     }
-    
+
 }
