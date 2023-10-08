@@ -7,7 +7,7 @@ import com.trevorism.gcloud.schedule.model.ScheduledTask
  */
 interface ScheduleService {
 
-    ScheduledTask create(ScheduledTask schedule)
+    ScheduledTask create(ScheduledTask schedule, String tenantId)
     ScheduledTask getByName(String name)
     ScheduledTask update(ScheduledTask scheduledTask, String name)
     List<ScheduledTask> list()

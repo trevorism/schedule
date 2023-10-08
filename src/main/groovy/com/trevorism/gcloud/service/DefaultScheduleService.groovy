@@ -15,6 +15,7 @@ import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.ClasspathBasedPropertiesProvider
 import com.trevorism.PropertiesProvider
+import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -36,14 +37,14 @@ class DefaultScheduleService implements ScheduleService {
     private SecureHttpClient secureHttpClient
 
     DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider){
-        this.secureHttpClient = secureHttpClient;
-        repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
+        this.repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
+        this.secureHttpClient = new AppClientSecureHttpClient()
     }
 
     @Override
-    ScheduledTask create(ScheduledTask schedule) {
-        schedule = ScheduledTaskValidator.cleanup(schedule)
+    ScheduledTask create(ScheduledTask schedule, String tenantId) {
+        schedule = ScheduledTaskValidator.cleanup(schedule, tenantId)
         validator.validate(schedule, false)
         schedule = repository.create(schedule)
         enqueue(schedule)
@@ -60,10 +61,11 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     ScheduledTask update(ScheduledTask schedule, String name) {
-        schedule = ScheduledTaskValidator.cleanup(schedule)
+        schedule = ScheduledTaskValidator.cleanup(schedule, null)
         validator.validate(schedule, true)
 
         ScheduledTask existingTask = getByName(name)
+        schedule.tenantId = existingTask.tenantId
         schedule = repository.update(existingTask.id, schedule)
 
         enqueue(schedule)

@@ -25,13 +25,13 @@ class DefaultScheduleServiceTest {
         scheduleService = new DefaultScheduleService([get: { String s -> return "pong"}] as SecureHttpClient, new CorrelationIdProvider())
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
-        scheduleService.create(TestScheduleService.createTestScheduledTaskNow())
+        scheduleService.create(TestScheduleService.createTestScheduledTaskNow(), null)
     }
 
     @Test
     void testCreate() {
         ScheduledTask task = new ScheduledTask(name: "test2", type: "minute", startDate: new Date(), enabled: false, endpoint: "endpoint", httpMethod: "get")
-        ScheduledTask createdTask = scheduleService.create(task)
+        ScheduledTask createdTask = scheduleService.create(task, null)
         assert scheduleService.list().size() == 2
         assert createdTask.id
         scheduleService.delete("test2")

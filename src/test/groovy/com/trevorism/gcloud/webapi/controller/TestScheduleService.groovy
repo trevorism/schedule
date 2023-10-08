@@ -16,7 +16,8 @@ class TestScheduleService implements ScheduleService {
     List<ScheduledTask> tasks = []
 
     @Override
-    ScheduledTask create(ScheduledTask schedule) {
+    ScheduledTask create(ScheduledTask schedule, String tenantId) {
+        schedule.tenantId = tenantId
         tasks << schedule
         return schedule
     }

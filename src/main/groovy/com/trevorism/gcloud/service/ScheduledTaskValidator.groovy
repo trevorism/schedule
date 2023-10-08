@@ -14,7 +14,8 @@ class ScheduledTaskValidator {
         this.service = service
     }
 
-    static ScheduledTask cleanup(ScheduledTask task){
+    static ScheduledTask cleanup(ScheduledTask task, String tenantId){
+        task.tenantId = tenantId
         task.name = task.name?.toLowerCase()
         task.httpMethod = task.httpMethod?.toLowerCase()
         if(task.endpoint)

@@ -16,7 +16,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "GET")
 
-        def result = validator.cleanup(task)
+        def result = validator.cleanup(task, null)
 
         assert result.httpMethod == "get"
         assert result.endpoint == "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json"
@@ -46,7 +46,7 @@ class ScheduledTaskValidatorTest {
     @Test
     void testValidate_InvalidMatchingName() {
         def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTaskNow())
+        service.create(TestScheduleService.createTestScheduledTaskNow(), null)
         ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
 
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
