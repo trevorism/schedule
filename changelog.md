@@ -1,3 +1,7 @@
+## 1.4.0
+
+Update micronaut and other dependencies.
+
 ## 1.3.0
 
 Enable multi-tenancy by allowing enqueued schedules 

@@ -2,9 +2,10 @@ package com.trevorism.gcloud.service
 
 import com.google.cloud.tasks.v2beta3.*
 import com.google.gson.Gson
-import com.google.gson.GsonBuilder
 import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
+import com.trevorism.ClasspathBasedPropertiesProvider
+import com.trevorism.PropertiesProvider
 import com.trevorism.bean.CorrelationIdProvider
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
@@ -14,33 +15,28 @@ import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
-import com.trevorism.ClasspathBasedPropertiesProvider
-import com.trevorism.PropertiesProvider
 import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
+import io.micronaut.runtime.http.scope.RequestScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 import java.nio.charset.Charset
 import java.time.Instant
-import java.time.LocalDateTime
-import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
-import java.time.temporal.ChronoUnit
 import java.util.concurrent.TimeUnit
 
-@jakarta.inject.Singleton
+@RequestScope
 class DefaultScheduleService implements ScheduleService {
 
-    private static final Logger log = LoggerFactory.getLogger( DefaultScheduleService )
+    private static final Logger log = LoggerFactory.getLogger(DefaultScheduleService)
 
     private Repository<ScheduledTask> repository
     private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
     private CorrelationIdProvider provider
     private SecureHttpClient secureHttpClient
 
-    DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider){
+    DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider) {
         this.repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
         this.secureHttpClient = new AppClientSecureHttpClient()
@@ -110,7 +106,7 @@ class DefaultScheduleService implements ScheduleService {
     boolean cleanup() {
         def date = Date.from(ZonedDateTime.now().minusDays(1).toInstant())
         def list = repository.all()
-        def immediates = list.findAll{ it.type == "immediate" && it.startDate < date}
+        def immediates = list.findAll { it.type == "immediate" && it.startDate < date }
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
             delete(it.name)
@@ -125,7 +121,7 @@ class DefaultScheduleService implements ScheduleService {
 
         String correlationId = UUID.randomUUID().toString()
         log.info("Enqueuing schedule ${schedule.name} using correlationId: ${correlationId}")
-        log.info("Scheduled for ${scheduleSeconds - (nowMillis/1000)} seconds from now using correlationId: ${correlationId}")
+        log.info("Scheduled for ${scheduleSeconds - (nowMillis / 1000)} seconds from now using correlationId: ${correlationId}")
 
         HttpRequest httpRequest = constructHttpRequest(schedule)
 
