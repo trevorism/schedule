@@ -49,7 +49,7 @@ class ScheduleController {
     @Operation(summary = "Create a new ScheduledTask **Secure")
     @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER, allowInternal = true)
-    ScheduledTask create(ScheduledTask schedule, HttpRequest<?> request) {
+    ScheduledTask create(@Body ScheduledTask schedule, HttpRequest<?> request) {
         try {
             String tenantId = null
             Optional<ServerAuthentication> wrappedTenant = request.getAttribute("micronaut.AUTHENTICATION", ServerAuthentication)
@@ -68,7 +68,7 @@ class ScheduleController {
     @Operation(summary = "Update a ScheduledTask **Secure")
     @Put(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    ScheduledTask update(String name, ScheduledTask schedule) {
+    ScheduledTask update(String name, @Body ScheduledTask schedule) {
         try {
             ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
             return updatedSchedule
