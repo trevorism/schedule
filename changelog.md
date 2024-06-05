@@ -1,3 +1,7 @@
+## 2.0.0
+
+Make schedules id based instead of name based. Add acceptance tests.
+
 ## 1.4.0
 
 Update micronaut and other dependencies.

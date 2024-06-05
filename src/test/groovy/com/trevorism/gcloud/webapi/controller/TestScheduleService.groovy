@@ -23,15 +23,15 @@ class TestScheduleService implements ScheduleService {
     }
 
     @Override
-    ScheduledTask getByName(String name) {
+    ScheduledTask get(String id) {
         tasks.find{
-            it.name == name
+            it.id == id
         }
     }
 
     @Override
-    ScheduledTask update(ScheduledTask scheduledTask, String name) {
-        tasks.remove(getByName(name))
+    ScheduledTask update(String id, ScheduledTask scheduledTask) {
+        tasks.remove(get(id))
         tasks.add(scheduledTask)
         return scheduledTask
     }
@@ -42,8 +42,10 @@ class TestScheduleService implements ScheduleService {
     }
 
     @Override
-    boolean delete(String name) {
-        tasks.remove(getByName(name))
+    ScheduledTask delete(String id) {
+        ScheduledTask task = get(id)
+        tasks.remove(task)
+        return task
     }
 
     @Override
@@ -62,17 +64,17 @@ class TestScheduleService implements ScheduleService {
     }
 
     static ScheduledTask createTestScheduledTaskNow() {
-        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).toInstant()), enabled: false, requestJson: "{}",
+        new ScheduledTask(id:"123", name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 
     static ScheduledTask createTestScheduledEarlier() {
-        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(60*30).toInstant()), enabled: false, requestJson: "{}",
+        new ScheduledTask(id:"123", name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).minusSeconds(60*30).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 
     static ScheduledTask createTestScheduledLater() {
-        new ScheduledTask(name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30).toInstant()), enabled: false, requestJson: "{}",
+        new ScheduledTask(id:"123", name: "test", type: "minute", startDate: Date.from(ZonedDateTime.now(ZoneOffset.UTC).plusSeconds(30).toInstant()), enabled: false, requestJson: "{}",
                 endpoint:"https://endpoint-tester.testing.trevorism.com/api/json")
     }
 }

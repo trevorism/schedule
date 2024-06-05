@@ -32,7 +32,7 @@ class TestRepository implements Repository<ScheduledTask> {
 
     @Override
     ScheduledTask create(ScheduledTask scheduledTask) {
-        scheduledTask.id = new Random().nextInt(100000).toString()
+        scheduledTask.id = scheduledTask.id
         tasks << scheduledTask
         return scheduledTask
     }

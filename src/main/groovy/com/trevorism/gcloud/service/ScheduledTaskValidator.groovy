@@ -24,15 +24,12 @@ class ScheduledTaskValidator {
         return task
     }
 
-    void validate(ScheduledTask scheduledTask, boolean allowDuplicate) {
+    static void validate(ScheduledTask scheduledTask) {
         try{
             (!scheduledTask.id) ?: Integer.parseInt(scheduledTask.id)
             if(!scheduledTask.name)
                 throw new RuntimeException("Scheduled task must have a name")
-            if(!allowDuplicate && service.getByName(scheduledTask.name)){
-                throw new RuntimeException("Scheduled task already exists")
-            }
-            if(!(["get","post","put","delete"].contains(scheduledTask.httpMethod)))
+            if(!(["get","post","put","delete","patch"].contains(scheduledTask.httpMethod)))
                 throw new RuntimeException("Invalid http method")
             if(!scheduledTask.endpoint)
                 throw new RuntimeException("Endpoint not specified")

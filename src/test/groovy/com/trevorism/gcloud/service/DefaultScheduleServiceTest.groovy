@@ -1,11 +1,9 @@
 package com.trevorism.gcloud.service
 
 import com.trevorism.bean.CorrelationIdProvider
-import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
-import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -23,7 +21,7 @@ class DefaultScheduleServiceTest {
 
     @BeforeEach
     void setup() {
-        scheduleService = new DefaultScheduleService([get: { String s -> return "pong"}] as SecureHttpClient, new CorrelationIdProvider())
+        scheduleService = new DefaultScheduleService([get: { String s -> return "pong" }] as SecureHttpClient, new CorrelationIdProvider())
         scheduleService.repository = new TestRepository()
         addedToQueue = 0
         scheduleService.create(TestScheduleService.createTestScheduledTaskNow(), null)
@@ -31,19 +29,19 @@ class DefaultScheduleServiceTest {
 
     @Test
     void testCreate() {
-        ScheduledTask task = new ScheduledTask(name: "test2", type: "minute", startDate: new Date(), enabled: false, endpoint: "endpoint", httpMethod: "get")
+        ScheduledTask task = new ScheduledTask(id: "456", name: "test2", type: "minute", startDate: new Date(), enabled: false, endpoint: "endpoint", httpMethod: "get")
         ScheduledTask createdTask = scheduleService.create(task, null)
         assert scheduleService.list().size() == 2
         assert createdTask.id
-        scheduleService.delete("test2")
+        scheduleService.delete("456")
         assert scheduleService.list().size() == 1
     }
 
     @Test
-    void testGetByName() {
-        ScheduledTask task = scheduleService.getByName("test")
+    void testGet() {
+        ScheduledTask task = scheduleService.get("123")
         assert task.name == "test"
-        assert task.id
+        assert task.id == "123"
         assert !task.enabled
     }
 
@@ -55,22 +53,22 @@ class DefaultScheduleServiceTest {
 
     @Test
     void testDelete() {
-        scheduleService.delete("test")
+        scheduleService.delete("123")
         assert scheduleService.list().size() == 0
     }
 
     @Test
     void testUpdate() {
-        ScheduledTask task = new ScheduledTask(name: "test", type: "hourly", startDate: new Date(), enabled: false, endpoint: "endpoint", requestJson: "{}")
-        scheduleService.update(task, "test")
+        ScheduledTask task = new ScheduledTask(id: "123", name: "test", type: "hourly", startDate: new Date(), enabled: false, endpoint: "endpoint", requestJson: "{}")
+        scheduleService.update("123", task)
         assert scheduleService.list().size() == 1
-        assert !scheduleService.getByName("test").enabled
-        assert scheduleService.getByName("test").type == "hourly"
+        assert !scheduleService.get("123").enabled
+        assert scheduleService.get("123").type == "hourly"
     }
 
 
     @Test
-    void testCleanup(){
+    void testCleanup() {
         assert !scheduleService.cleanup()
     }
 

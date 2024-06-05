@@ -32,8 +32,8 @@ class ScheduleControllerTest {
 
     @Test
     void testGet() {
-        ScheduledTask task = scheduleController.get("test")
-        assert task.name == "test"
+        ScheduledTask task = scheduleController.get("123")
+        assert task.id == "123"
         assert task.type == "minute"
         assert !task.enabled
 
@@ -44,29 +44,29 @@ class ScheduleControllerTest {
 
     @Test
     void testCreate() {
-        ScheduledTask task = new ScheduledTask(name: "test2", type: "minute", startDate: new Date(), enabled: true)
+        ScheduledTask task = new ScheduledTask(id:"22", name: "test2", type: "minute", startDate: new Date(), enabled: true)
         scheduleController.create(task, new SimpleHttpRequest<>(HttpMethod.GET, "/", ""))
 
         assert scheduleController.list().size() == 2
-        scheduleController.delete("test2")
+        scheduleController.delete("22")
         assert scheduleController.list().size() == 1
 
     }
 
     @Test
     void testDelete() {
-        scheduleController.delete("test")
+        scheduleController.delete("123")
         assert scheduleController.list().size() == 0
 
     }
 
     @Test
     void testUpdate() {
-        ScheduledTask task = new ScheduledTask(name: "test", type: "progressive", startDate: new Date(), enabled: true)
-        scheduleController.update("test", task)
+        ScheduledTask task = new ScheduledTask(id: "123", name: "test", type: "progressive", startDate: new Date(), enabled: true)
+        scheduleController.update("123", task)
         assert scheduleController.list().size() == 1
-        assert scheduleController.get("test").enabled
-        assert scheduleController.get("test").type == "progressive"
+        assert scheduleController.get("123").enabled
+        assert scheduleController.get("123").type == "progressive"
 
     }
 

@@ -29,7 +29,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(id: "123", name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        validator.validate(task, false)
+        validator.validate(task)
     }
 
     @Test
@@ -39,20 +39,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        Assertions.assertThrows(RuntimeException, () -> validator.validate(task, false))
-    }
-
-
-    @Test
-    void testValidate_InvalidMatchingName() {
-        def service = new TestScheduleService()
-        service.create(TestScheduleService.createTestScheduledTaskNow(), null)
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(service)
-
-        def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
-                endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
-
-        Assertions.assertThrows(RuntimeException, () -> validator.validate(task, false))
+        Assertions.assertThrows(RuntimeException, () -> validator.validate(task))
     }
 
     @Test
@@ -62,7 +49,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "execute")
 
-        Assertions.assertThrows(RuntimeException, () -> validator.validate(task, false))
+        Assertions.assertThrows(RuntimeException, () -> validator.validate(task))
     }
 
     @Test
@@ -71,7 +58,7 @@ class ScheduledTaskValidatorTest {
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}", httpMethod: "get")
 
-        Assertions.assertThrows(RuntimeException, () ->validator.validate(task, false))
+        Assertions.assertThrows(RuntimeException, () ->validator.validate(task))
     }
 
     @Test
@@ -81,6 +68,6 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
                 requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json")
 
-        Assertions.assertThrows(RuntimeException, () ->validator.validate(task, false))
+        Assertions.assertThrows(RuntimeException, () ->validator.validate(task))
     }
 }

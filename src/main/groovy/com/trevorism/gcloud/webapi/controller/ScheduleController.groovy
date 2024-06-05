@@ -38,11 +38,11 @@ class ScheduleController {
     }
 
     @Tag(name = "Schedule Operations")
-    @Operation(summary = "View a ScheduledTask with the {name} **Secure")
-    @Get(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
+    @Operation(summary = "View a ScheduledTask by {id} **Secure")
+    @Get(value = "schedule/{id}", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    ScheduledTask get(String name) {
-        scheduleService.getByName(name)
+    ScheduledTask get(String id) {
+        scheduleService.get(id)
     }
 
     @Tag(name = "Schedule Operations")
@@ -51,11 +51,7 @@ class ScheduleController {
     @Secure(value = Roles.USER, allowInternal = true)
     ScheduledTask create(@Body ScheduledTask schedule, HttpRequest<?> request) {
         try {
-            String tenantId = null
-            Optional<ServerAuthentication> wrappedTenant = request.getAttribute("micronaut.AUTHENTICATION", ServerAuthentication)
-            if(wrappedTenant.isPresent())
-                tenantId = wrappedTenant.get()?.attributes?.get("tenant")
-
+            String tenantId = tenantIdFromRequest(request)
             ScheduledTask createdSchedule = scheduleService.create(schedule, tenantId)
             return createdSchedule
         } catch (Exception e) {
@@ -66,11 +62,11 @@ class ScheduleController {
 
     @Tag(name = "Schedule Operations")
     @Operation(summary = "Update a ScheduledTask **Secure")
-    @Put(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
+    @Put(value = "schedule/{id}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    ScheduledTask update(String name, @Body ScheduledTask schedule) {
+    ScheduledTask update(String id, @Body ScheduledTask schedule) {
         try {
-            ScheduledTask updatedSchedule = scheduleService.update(schedule, name)
+            ScheduledTask updatedSchedule = scheduleService.update(id, schedule)
             return updatedSchedule
         } catch (Exception e) {
             log.error("Unable to update scheduled task", e)
@@ -82,8 +78,16 @@ class ScheduleController {
     @Operation(summary = "Delete a ScheduledTask with the {name} **Secure")
     @Delete(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    boolean delete(String name) {
+    ScheduledTask delete(String name) {
         scheduleService.delete(name)
     }
 
+
+    private static String tenantIdFromRequest(HttpRequest<?> request) {
+        String tenantId = null
+        Optional<ServerAuthentication> wrappedTenant = request.getAttribute("micronaut.AUTHENTICATION", ServerAuthentication)
+        if (wrappedTenant.isPresent())
+            tenantId = wrappedTenant.get()?.attributes?.get("tenant")
+        return tenantId
+    }
 }

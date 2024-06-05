@@ -8,10 +8,12 @@ import com.trevorism.gcloud.schedule.model.ScheduledTask
 interface ScheduleService {
 
     ScheduledTask create(ScheduledTask schedule, String tenantId)
-    ScheduledTask getByName(String name)
-    ScheduledTask update(ScheduledTask scheduledTask, String name)
+
     List<ScheduledTask> list()
-    boolean delete(String name)
+    ScheduledTask get(String id)
+    ScheduledTask update(String id, ScheduledTask scheduledTask)
+    ScheduledTask delete(String id)
+
 
     void enqueue(ScheduledTask schedule)
     boolean enqueueAll()

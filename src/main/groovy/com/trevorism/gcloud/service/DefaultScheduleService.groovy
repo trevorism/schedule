@@ -9,8 +9,6 @@ import com.trevorism.PropertiesProvider
 import com.trevorism.bean.CorrelationIdProvider
 import com.trevorism.data.PingingDatastoreRepository
 import com.trevorism.data.Repository
-import com.trevorism.data.model.filtering.FilterBuilder
-import com.trevorism.data.model.filtering.SimpleFilter
 import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
@@ -45,26 +43,23 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     ScheduledTask create(ScheduledTask schedule, String tenantId) {
         schedule = ScheduledTaskValidator.cleanup(schedule, tenantId)
-        validator.validate(schedule, false)
+        validator.validate(schedule)
         schedule = repository.create(schedule)
         enqueue(schedule)
         return schedule
     }
 
     @Override
-    ScheduledTask getByName(String name) {
-        def task = repository.filter(new FilterBuilder().addFilter(new SimpleFilter("name", "=", name.toLowerCase())).build())
-        if (!task)
-            return null
-        return task[0]
+    ScheduledTask get(String id) {
+        repository.get(id)
     }
 
     @Override
-    ScheduledTask update(ScheduledTask schedule, String name) {
+    ScheduledTask update(String id, ScheduledTask schedule) {
         schedule = ScheduledTaskValidator.cleanup(schedule, null)
-        validator.validate(schedule, true)
+        validator.validate(schedule)
 
-        ScheduledTask existingTask = getByName(name)
+        ScheduledTask existingTask = get(id)
         schedule.tenantId = existingTask.tenantId
         schedule = repository.update(existingTask.id, schedule)
 
@@ -78,11 +73,12 @@ class DefaultScheduleService implements ScheduleService {
     }
 
     @Override
-    boolean delete(String name) {
-        ScheduledTask task = getByName(name)
+    ScheduledTask delete(String id) {
+        ScheduledTask task = get(id)
         if (task) {
             repository.delete(task.id)
         }
+        return task
     }
 
     @Override
@@ -109,7 +105,7 @@ class DefaultScheduleService implements ScheduleService {
         def immediates = list.findAll { it.type == "immediate" && it.startDate < date }
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
-            delete(it.name)
+            delete(it.id)
         }
 
         return immediates
