@@ -21,8 +21,9 @@ class DefaultScheduleServiceTest {
 
     @BeforeEach
     void setup() {
-        scheduleService = new DefaultScheduleService([get: { String s -> return "pong" }] as SecureHttpClient, new CorrelationIdProvider())
+        scheduleService = new DefaultScheduleService(new CorrelationIdProvider())
         scheduleService.repository = new TestRepository()
+        scheduleService.secureHttpClient = [get: { String s -> return "pong" }] as SecureHttpClient
         addedToQueue = 0
         scheduleService.create(TestScheduleService.createTestScheduledTaskNow(), null)
     }

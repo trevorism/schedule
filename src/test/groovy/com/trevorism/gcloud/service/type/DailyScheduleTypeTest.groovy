@@ -1,10 +1,11 @@
 package com.trevorism.gcloud.service.type
 
-
+import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
 import org.junit.jupiter.api.Test
 
 import java.time.ZoneId
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
@@ -86,7 +87,7 @@ class DailyScheduleTypeTest {
         assert countdownTime == 3000000
     }
 
-    private long getCountdownMillisBasedOnDailyLogic(ZonedDateTime now, ZonedDateTime desiredTime) {
+    private static long getCountdownMillisBasedOnDailyLogic(ZonedDateTime now, ZonedDateTime desiredTime) {
         ZonedDateTime targetTime = now.withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
 
         if(now.getHour() == 23){

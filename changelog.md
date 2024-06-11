@@ -1,3 +1,7 @@
+## 2.1.0
+
+Removed multitenancy support as it was bugged.
+
 ## 2.0.0
 
 Make schedules id based instead of name based. Add acceptance tests.

@@ -15,7 +15,6 @@ import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.https.AppClientSecureHttpClient
 import com.trevorism.https.SecureHttpClient
-import io.micronaut.runtime.http.scope.RequestScope
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -24,7 +23,7 @@ import java.time.Instant
 import java.time.ZonedDateTime
 import java.util.concurrent.TimeUnit
 
-@RequestScope
+@jakarta.inject.Singleton
 class DefaultScheduleService implements ScheduleService {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultScheduleService)
@@ -34,10 +33,10 @@ class DefaultScheduleService implements ScheduleService {
     private CorrelationIdProvider provider
     private SecureHttpClient secureHttpClient
 
-    DefaultScheduleService(SecureHttpClient secureHttpClient, CorrelationIdProvider provider) {
+    DefaultScheduleService(CorrelationIdProvider provider) {
+        this.secureHttpClient = new AppClientSecureHttpClient()
         this.repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
-        this.secureHttpClient = new AppClientSecureHttpClient()
     }
 
     @Override
@@ -184,5 +183,6 @@ class DefaultScheduleService implements ScheduleService {
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }
+        return null
     }
 }
