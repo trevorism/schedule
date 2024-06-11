@@ -90,7 +90,7 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     boolean enqueueAll() {
-        def list = repository.all()
+        def list = repository.list()
         list.each { ScheduledTask st ->
             enqueue(st)
         }
@@ -100,7 +100,7 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     boolean cleanup() {
         def date = Date.from(ZonedDateTime.now().minusDays(1).toInstant())
-        def list = repository.all()
+        def list = repository.list()
         def immediates = list.findAll { it.type == "immediate" && it.startDate < date }
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
