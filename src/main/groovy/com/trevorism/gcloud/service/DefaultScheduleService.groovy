@@ -7,7 +7,7 @@ import com.google.protobuf.Timestamp
 import com.trevorism.ClasspathBasedPropertiesProvider
 import com.trevorism.PropertiesProvider
 import com.trevorism.bean.CorrelationIdProvider
-import com.trevorism.data.PingingDatastoreRepository
+import com.trevorism.data.FastDatastoreRepository
 import com.trevorism.data.Repository
 import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
@@ -35,7 +35,7 @@ class DefaultScheduleService implements ScheduleService {
 
     DefaultScheduleService(CorrelationIdProvider provider) {
         this.secureHttpClient = new AppClientSecureHttpClient()
-        this.repository = new PingingDatastoreRepository<>(ScheduledTask, secureHttpClient)
+        this.repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         this.provider = provider
     }
 
