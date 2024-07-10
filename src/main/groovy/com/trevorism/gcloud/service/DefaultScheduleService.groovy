@@ -17,6 +17,7 @@ import com.trevorism.http.HttpClient
 import com.trevorism.http.JsonHttpClient
 import com.trevorism.https.SecureHttpClient
 import com.trevorism.https.SecureHttpClientBase
+import com.trevorism.https.token.ObtainTokenFromAuthServiceFromPropertiesFile
 import com.trevorism.https.token.ObtainTokenFromParameter
 import jakarta.inject.Inject
 import org.slf4j.Logger
@@ -117,12 +118,9 @@ class DefaultScheduleService implements ScheduleService {
 
     private void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType, Repository<ScheduledTask> repository) {
         long nowMillis = Instant.now().toEpochMilli()
-        long scheduleSeconds = (nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000
+        long scheduleSeconds = (long)((nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000)
 
-        String correlationId = UUID.randomUUID().toString()
-        log.info("Enqueuing schedule ${schedule.name} using correlationId: ${correlationId}")
-        log.info("Scheduled for ${scheduleSeconds - (nowMillis / 1000)} seconds from now using correlationId: ${correlationId}")
-
+        log.info("Enqueuing schedule ${schedule.name} for ${scheduleSeconds - (nowMillis / 1000)} seconds from now")
         HttpRequest httpRequest = constructHttpRequest(schedule)
 
         Task.Builder taskBuilder = Task.newBuilder()
@@ -134,7 +132,7 @@ class DefaultScheduleService implements ScheduleService {
 
         if (task.name && scheduleType.name == "immediate" && repository != null) {
             schedule.enabled = false
-            log.info("${correlationId}: Updating schedule to enabled=false since the schedule is already enqueued. This avoids accidental multiple invocations.")
+            log.debug("Updating schedule.enabled to false since the schedule is already enqueued. This avoids accidental multiple invocations.")
             repository.update(schedule.id, schedule)
         }
 
@@ -183,7 +181,8 @@ class DefaultScheduleService implements ScheduleService {
         try {
             String subject = propertiesProvider.getProperty("clientId")
             InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: scheduledTask.tenantId)
-            return secureHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
+            SecureHttpClient appHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromAuthServiceFromPropertiesFile()) {}
+            return appHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }
