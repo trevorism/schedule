@@ -1,3 +1,7 @@
+## 2.2.0
+
+Add back multitenancy support. Update dependencies.
+
 ## 2.1.0
 
 Removed multitenancy support as it was bugged.

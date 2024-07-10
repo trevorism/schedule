@@ -1,8 +1,7 @@
 package com.trevorism.gcloud.webapi.controller
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
-import io.micronaut.http.HttpMethod
-import io.micronaut.http.simple.SimpleHttpRequest
+import io.micronaut.security.authentication.Authentication
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -16,7 +15,7 @@ class ScheduleControllerTest {
     @BeforeEach
     void setup(){
         scheduleController.scheduleService = new TestScheduleService()
-        scheduleController.create(TestScheduleService.createTestScheduledTaskNow(), new SimpleHttpRequest<>(HttpMethod.GET, "/", ""))
+        scheduleController.create(TestScheduleService.createTestScheduledTaskNow(), { } as Authentication)
     }
 
     @Test
@@ -45,7 +44,7 @@ class ScheduleControllerTest {
     @Test
     void testCreate() {
         ScheduledTask task = new ScheduledTask(id:"22", name: "test2", type: "minute", startDate: new Date(), enabled: true)
-        scheduleController.create(task, new SimpleHttpRequest<>(HttpMethod.GET, "/", ""))
+        scheduleController.create(task, null)
 
         assert scheduleController.list().size() == 2
         scheduleController.delete("22")

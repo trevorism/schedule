@@ -12,7 +12,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testCleanup() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
         def task = new ScheduledTask(name: "test", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "GET")
 
@@ -24,7 +24,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
 
         def task = new ScheduledTask(id: "123", name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
@@ -34,7 +34,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate_InvalidNullName() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
 
         def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
@@ -44,7 +44,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate_InvalidHttpMethod() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "execute")
@@ -54,7 +54,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate_InvalidEndpoint() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}", httpMethod: "get")
 
@@ -63,7 +63,7 @@ class ScheduledTaskValidatorTest {
 
     @Test
     void testValidate_InvalidId() {
-        ScheduledTaskValidator validator = new ScheduledTaskValidator(new TestScheduleService())
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
 
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
                 requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json")

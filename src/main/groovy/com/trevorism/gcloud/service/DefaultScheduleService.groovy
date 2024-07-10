@@ -2,19 +2,23 @@ package com.trevorism.gcloud.service
 
 import com.google.cloud.tasks.v2beta3.*
 import com.google.gson.Gson
+import com.google.gson.GsonBuilder
 import com.google.protobuf.ByteString
 import com.google.protobuf.Timestamp
-import com.trevorism.ClasspathBasedPropertiesProvider
 import com.trevorism.PropertiesProvider
-import com.trevorism.bean.CorrelationIdProvider
 import com.trevorism.data.FastDatastoreRepository
 import com.trevorism.data.Repository
+import com.trevorism.gcloud.schedule.model.DatastoreTokenRequest
 import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
-import com.trevorism.https.AppClientSecureHttpClient
+import com.trevorism.http.HttpClient
+import com.trevorism.http.JsonHttpClient
 import com.trevorism.https.SecureHttpClient
+import com.trevorism.https.SecureHttpClientBase
+import com.trevorism.https.token.ObtainTokenFromParameter
+import jakarta.inject.Inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
@@ -28,51 +32,53 @@ class DefaultScheduleService implements ScheduleService {
 
     private static final Logger log = LoggerFactory.getLogger(DefaultScheduleService)
 
-    private Repository<ScheduledTask> repository
-    private ScheduledTaskValidator validator = new ScheduledTaskValidator(this)
-    private CorrelationIdProvider provider
-    private SecureHttpClient secureHttpClient
+    private Gson gson = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
+    private HttpClient singletonClient = new JsonHttpClient()
 
-    DefaultScheduleService(CorrelationIdProvider provider) {
-        this.secureHttpClient = new AppClientSecureHttpClient()
-        this.repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
-        this.provider = provider
-    }
+    @Inject
+    private SecureHttpClient secureHttpClient
+    @Inject
+    PropertiesProvider propertiesProvider
 
     @Override
     ScheduledTask create(ScheduledTask schedule, String tenantId) {
         schedule = ScheduledTaskValidator.cleanup(schedule, tenantId)
-        validator.validate(schedule)
+        ScheduledTaskValidator.validate(schedule)
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         schedule = repository.create(schedule)
-        enqueue(schedule)
+        enqueue(schedule, repository)
         return schedule
     }
 
     @Override
     ScheduledTask get(String id) {
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         repository.get(id)
     }
 
     @Override
     ScheduledTask update(String id, ScheduledTask schedule) {
         schedule = ScheduledTaskValidator.cleanup(schedule, null)
-        validator.validate(schedule)
+        ScheduledTaskValidator.validate(schedule)
 
         ScheduledTask existingTask = get(id)
         schedule.tenantId = existingTask.tenantId
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         schedule = repository.update(existingTask.id, schedule)
 
-        enqueue(schedule)
+        enqueue(schedule, repository)
         return schedule
     }
 
     @Override
     List<ScheduledTask> list() {
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         repository.list()
     }
 
     @Override
     ScheduledTask delete(String id) {
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
         ScheduledTask task = get(id)
         if (task) {
             repository.delete(task.id)
@@ -81,36 +87,35 @@ class DefaultScheduleService implements ScheduleService {
     }
 
     @Override
-    void enqueue(ScheduledTask schedule) {
+    void enqueue(ScheduledTask schedule, Repository<ScheduledTask> repository) {
         ScheduleType type = ScheduleTypeFactory.create(schedule.type)
         if (shouldBeEnqueued(schedule, type)) {
-            enqueueSchedule(schedule, type)
+            enqueueSchedule(schedule, type, repository)
         }
     }
 
     @Override
     boolean enqueueAll() {
-        def list = repository.list()
+        List<ScheduledTask> list = getScheduledTasksAcrossAllTenants()
         list.each { ScheduledTask st ->
-            enqueue(st)
+            enqueue(st, null)
         }
         return list
     }
 
     @Override
     boolean cleanup() {
+        List<ScheduledTask> list = getScheduledTasksAcrossAllTenants()
         def date = Date.from(ZonedDateTime.now().minusDays(1).toInstant())
-        def list = repository.list()
         def immediates = list.findAll { it.type == "immediate" && it.startDate < date }
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
             delete(it.id)
         }
-
         return immediates
     }
 
-    void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType) {
+    private void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType, Repository<ScheduledTask> repository) {
         long nowMillis = Instant.now().toEpochMilli()
         long scheduleSeconds = (nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000
 
@@ -127,7 +132,7 @@ class DefaultScheduleService implements ScheduleService {
         final String queuePath = QueueName.of("trevorism-action", "us-east4", "default").toString()
         Task task = client.createTask(queuePath, taskBuilder.build())
 
-        if (task.name && scheduleType.name == "immediate") {
+        if (task.name && scheduleType.name == "immediate" && repository != null) {
             schedule.enabled = false
             log.info("${correlationId}: Updating schedule to enabled=false since the schedule is already enqueued. This avoids accidental multiple invocations.")
             repository.update(schedule.id, schedule)
@@ -141,7 +146,7 @@ class DefaultScheduleService implements ScheduleService {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
         String scheduleToken = getScheduleToken(schedule)
         if (scheduleToken) {
-            httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken).putHeaders(CorrelationIdProvider.X_CORRELATION_ID, provider.getCorrelationId())
+            httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken)
         }
         if (schedule.httpMethod == "get") {
             httpBuilder = httpBuilder.setHttpMethod(HttpMethod.GET)
@@ -176,13 +181,30 @@ class DefaultScheduleService implements ScheduleService {
 
     private String getScheduleToken(ScheduledTask scheduledTask) {
         try {
-            PropertiesProvider pp = new ClasspathBasedPropertiesProvider()
-            String subject = pp.getProperty("clientId")
+            String subject = propertiesProvider.getProperty("clientId")
             InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: scheduledTask.tenantId)
             return secureHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }
         return null
+    }
+
+    private List<ScheduledTask> getScheduledTasksAcrossAllTenants() {
+        String token = getTokenForSystemRoleToDatastoreAudience()
+        SecureHttpClient httpClientForSystemRoleToDatastoreAudience = new SecureHttpClientBase(singletonClient,
+                new ObtainTokenFromParameter(token)) {}
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, httpClientForSystemRoleToDatastoreAudience)
+        return repository.all()
+    }
+
+    private String getTokenForSystemRoleToDatastoreAudience() {
+        try {
+            DatastoreTokenRequest tokenRequest = DatastoreTokenRequest.get(propertiesProvider)
+            return secureHttpClient.post("https://auth.trevorism.com/token", gson.toJson(tokenRequest))
+        } catch (Exception e) {
+            log.error("Unable to get token", e)
+            throw e
+        }
     }
 }

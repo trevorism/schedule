@@ -8,12 +8,6 @@ import com.trevorism.http.util.CleanUrl
  */
 class ScheduledTaskValidator {
 
-    private final ScheduleService service
-
-    ScheduledTaskValidator(ScheduleService service){
-        this.service = service
-    }
-
     static ScheduledTask cleanup(ScheduledTask task, String tenantId){
         task.tenantId = tenantId
         task.name = task.name?.toLowerCase()

@@ -1,5 +1,6 @@
 package com.trevorism.gcloud.service
 
+import com.trevorism.data.Repository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 
 /**
@@ -15,7 +16,7 @@ interface ScheduleService {
     ScheduledTask delete(String id)
 
 
-    void enqueue(ScheduledTask schedule)
+    void enqueue(ScheduledTask schedule, Repository<ScheduledTask> repository)
     boolean enqueueAll()
 
     boolean cleanup()

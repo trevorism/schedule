@@ -4,10 +4,9 @@ import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.ScheduleService
 import com.trevorism.secure.Roles
 import com.trevorism.secure.Secure
-import io.micronaut.http.HttpRequest
 import io.micronaut.http.MediaType
 import io.micronaut.http.annotation.*
-import io.micronaut.security.authentication.ServerAuthentication
+import io.micronaut.security.authentication.Authentication
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.inject.Inject
@@ -49,9 +48,9 @@ class ScheduleController {
     @Operation(summary = "Create a new ScheduledTask **Secure")
     @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER, allowInternal = true)
-    ScheduledTask create(@Body ScheduledTask schedule, HttpRequest<?> request) {
+    ScheduledTask create(@Body ScheduledTask schedule, Authentication authentication) {
         try {
-            String tenantId = tenantIdFromRequest(request)
+            String tenantId = tenantIdFromRequest(authentication)
             ScheduledTask createdSchedule = scheduleService.create(schedule, tenantId)
             return createdSchedule
         } catch (Exception e) {
@@ -82,12 +81,7 @@ class ScheduleController {
         scheduleService.delete(name)
     }
 
-
-    private static String tenantIdFromRequest(HttpRequest<?> request) {
-        String tenantId = null
-        Optional<ServerAuthentication> wrappedTenant = request.getAttribute("micronaut.AUTHENTICATION", ServerAuthentication)
-        if (wrappedTenant.isPresent())
-            tenantId = wrappedTenant.get()?.attributes?.get("tenant")
-        return tenantId
+    private static String tenantIdFromRequest(Authentication authentication) {
+        return authentication?.getAttributes()?.get("tenant")
     }
 }

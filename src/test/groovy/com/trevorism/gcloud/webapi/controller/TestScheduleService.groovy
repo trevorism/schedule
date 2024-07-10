@@ -1,5 +1,6 @@
 package com.trevorism.gcloud.webapi.controller
 
+import com.trevorism.data.Repository
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.ScheduleService
 
@@ -49,7 +50,7 @@ class TestScheduleService implements ScheduleService {
     }
 
     @Override
-    void enqueue(ScheduledTask schedule) {
+    void enqueue(ScheduledTask schedule, Repository<ScheduledTask> repository) {
         ++enqueueCalled
     }
 
