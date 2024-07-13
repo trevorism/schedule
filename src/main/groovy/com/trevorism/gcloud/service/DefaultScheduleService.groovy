@@ -78,9 +78,11 @@ class DefaultScheduleService implements ScheduleService {
     }
 
     @Override
-    ScheduledTask delete(String id) {
-        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
-        ScheduledTask task = get(id)
+    ScheduledTask delete(String id, String tenantId) {
+        String scheduleToken = getInternalToken(tenantId)
+        SecureHttpClient internalSecureHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromParameter(scheduleToken)) {}
+        Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, internalSecureHttpClient)
+        ScheduledTask task = repository.get(id)
         if (task) {
             repository.delete(task.id)
         }
@@ -111,7 +113,7 @@ class DefaultScheduleService implements ScheduleService {
         def immediates = list.findAll { it.type == "immediate" && it.startDate < date }
         log.info("Number of old schedules to delete: ${immediates.size()}")
         immediates.each {
-            delete(it.id)
+            delete(it.id, it.tenantId)
         }
         return immediates
     }
@@ -142,7 +144,7 @@ class DefaultScheduleService implements ScheduleService {
 
     private HttpRequest constructHttpRequest(ScheduledTask schedule) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
-        String scheduleToken = getScheduleToken(schedule)
+        String scheduleToken = getInternalToken(schedule.tenantId)
         if (scheduleToken) {
             httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken)
         }
@@ -177,10 +179,10 @@ class DefaultScheduleService implements ScheduleService {
         return scheduledTask.enabled
     }
 
-    private String getScheduleToken(ScheduledTask scheduledTask) {
+    private String getInternalToken(String tenantId) {
         try {
             String subject = propertiesProvider.getProperty("clientId")
-            InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: scheduledTask.tenantId)
+            InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: tenantId)
             SecureHttpClient appHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromAuthServiceFromPropertiesFile()) {}
             return appHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
         } catch (Exception ignored) {

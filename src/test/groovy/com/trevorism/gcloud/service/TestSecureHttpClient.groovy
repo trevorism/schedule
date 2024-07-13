@@ -34,6 +34,10 @@ class TestSecureHttpClient implements SecureHttpClient{
 
     @Override
     HeadersHttpResponse get(String s, Map<String, String> map) {
+        if(s == "https://datastore.data.trevorism.com/object/scheduledtask/123")
+            return new HeadersHttpResponse("{}", map)
+        if(s == "https://datastore.data.trevorism.com/object/scheduledtask/456")
+            return new HeadersHttpResponse("{}", map)
         return new HeadersHttpResponse(gson.toJson(tasks), map)
     }
 
@@ -49,7 +53,7 @@ class TestSecureHttpClient implements SecureHttpClient{
 
     @Override
     HeadersHttpResponse post(String s, String s1, Map<String, String> map) {
-        return null
+        return new HeadersHttpResponse(s1, map)
     }
 
     @Override
@@ -83,6 +87,6 @@ class TestSecureHttpClient implements SecureHttpClient{
 
     @Override
     HeadersHttpResponse delete(String s, Map<String, String> map) {
-        return null
+        return new HeadersHttpResponse("{}", map)
     }
 }

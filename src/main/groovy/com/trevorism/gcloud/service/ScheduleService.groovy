@@ -13,8 +13,7 @@ interface ScheduleService {
     List<ScheduledTask> list()
     ScheduledTask get(String id)
     ScheduledTask update(String id, ScheduledTask scheduledTask)
-    ScheduledTask delete(String id)
-
+    ScheduledTask delete(String id, String tenantId)
 
     void enqueue(ScheduledTask schedule, Repository<ScheduledTask> repository)
     boolean enqueueAll()

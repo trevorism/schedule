@@ -43,7 +43,7 @@ class TestScheduleService implements ScheduleService {
     }
 
     @Override
-    ScheduledTask delete(String id) {
+    ScheduledTask delete(String id, String tenantId) {
         ScheduledTask task = get(id)
         tasks.remove(task)
         return task

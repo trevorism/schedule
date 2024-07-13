@@ -1,7 +1,6 @@
 package com.trevorism.gcloud.service
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
-import com.trevorism.gcloud.webapi.controller.TestScheduleService
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 

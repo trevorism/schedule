@@ -47,16 +47,15 @@ class ScheduleControllerTest {
         scheduleController.create(task, null)
 
         assert scheduleController.list().size() == 2
-        scheduleController.delete("22")
+        scheduleController.delete("22", null)
         assert scheduleController.list().size() == 1
 
     }
 
     @Test
     void testDelete() {
-        scheduleController.delete("123")
+        scheduleController.delete("123", null)
         assert scheduleController.list().size() == 0
-
     }
 
     @Test

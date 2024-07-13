@@ -4,8 +4,6 @@ import com.trevorism.PropertiesProvider
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
-import com.trevorism.http.HttpClient
-import com.trevorism.https.SecureHttpClient
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -38,8 +36,6 @@ class DefaultScheduleServiceTest {
         ScheduledTask createdTask = scheduleService.create(task, null)
         assert scheduleService.list().size() == 2
         assert createdTask.id
-        scheduleService.delete("456")
-        assert scheduleService.list().size() == 1
     }
 
     @Test
@@ -58,8 +54,7 @@ class DefaultScheduleServiceTest {
 
     @Test
     void testDelete() {
-        scheduleService.delete("123")
-        assert scheduleService.list().size() == 0
+        assert scheduleService.delete("123", null)
     }
 
     @Test

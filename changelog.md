@@ -1,3 +1,7 @@
+## 2.3.0
+
+Fix issue with old schedule cleanup.
+
 ## 2.2.0
 
 Add back multitenancy support. Update dependencies.

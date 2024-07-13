@@ -1,11 +1,9 @@
 package com.trevorism.gcloud.service.type
 
-import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
 import org.junit.jupiter.api.Test
 
 import java.time.ZoneId
-import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
