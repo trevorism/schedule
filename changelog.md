@@ -1,3 +1,7 @@
+## 2.4.0
+
+Fix issue with future enqueued schedule.
+
 ## 2.3.0
 
 Fix issue with old schedule cleanup.

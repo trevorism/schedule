@@ -101,7 +101,10 @@ class DefaultScheduleService implements ScheduleService {
     boolean enqueueAll() {
         List<ScheduledTask> list = getScheduledTasksAcrossAllTenants()
         list.each { ScheduledTask st ->
-            enqueue(st, null)
+            String token = getInternalToken(st.tenantId)
+            SecureHttpClient httpInternalClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromParameter(token)) {}
+            Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, httpInternalClient)
+            enqueue(st, repository)
         }
         return list
     }
@@ -132,7 +135,7 @@ class DefaultScheduleService implements ScheduleService {
         final String queuePath = QueueName.of("trevorism-action", "us-east4", "default").toString()
         Task task = client.createTask(queuePath, taskBuilder.build())
 
-        if (task.name && scheduleType.name == "immediate" && repository != null) {
+        if (task.name && scheduleType.name == "immediate") {
             schedule.enabled = false
             log.debug("Updating schedule.enabled to false since the schedule is already enqueued. This avoids accidental multiple invocations.")
             repository.update(schedule.id, schedule)
