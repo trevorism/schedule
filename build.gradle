@@ -58,8 +58,8 @@ dependencies {
     runtimeOnly("ch.qos.logback:logback-classic")
 
     implementation 'com.google.code.gson:gson:2.14.0'
-    implementation 'com.google.cloud:google-cloud-tasks:2.46.0'
-    implementation 'com.trevorism:micronaut-utility-beans:1.6.0'
+    implementation 'com.google.cloud:google-cloud-tasks:2.92.0'
+    implementation 'com.trevorism:micronaut-utility-beans:1.7.2'
     implementation 'com.trevorism:datastore-client:4.1.0'
 
     testImplementation 'com.trevorism:test-result-events:0.3.0'

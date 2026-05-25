@@ -14,7 +14,7 @@ class ScheduledTask {
     @Schema(description = "Unique name of the task")
     String name
 
-    @Schema(description = "The type of scheduling task", allowableValues = "daily,hourly,immediate")
+    @Schema(description = "The type of scheduling task (daily, hourly, or immediate)", example = "daily")
     String type
     @Schema(description = "When the task will start")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd'T'HH:mm:ss'Z'")
@@ -24,10 +24,10 @@ class ScheduledTask {
 
     @Schema(description = "Endpoint for the task")
     String endpoint
-    @Schema(description = "HTTP Method for the task", allowableValues = "get,post,put,patch,delete")
+    @Schema(description = "HTTP Method for the task (get, post, put, patch, or delete)", example = "post")
     String httpMethod = "post"
 
-    @Schema(description = "For POST, PUT, and PATCH the request body", allowableValues = "get,post,put,patch,delete")
+    @Schema(description = "For POST, PUT, and PATCH the request body")
     String requestJson
 
     @Schema(description = "The tenantId of the schedule", type = "String")
