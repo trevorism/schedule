@@ -1,4 +1,4 @@
-runtime: java17
+runtime: java25
 service: schedule
 entrypoint: java -jar schedule-all.jar
 handlers:
