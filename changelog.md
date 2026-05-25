@@ -1,3 +1,7 @@
+## 2.5.0
+
+Upgrade to Micronaut 5.0.0, Java 25, Gradle 9.x, and latest dependencies.
+
 ## 2.4.0
 
 Fix issue with future enqueued schedule.
