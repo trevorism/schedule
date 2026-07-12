@@ -35,6 +35,7 @@ class DefaultScheduleService implements ScheduleService {
 
     private Gson gson = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
     private HttpClient singletonClient = new JsonHttpClient()
+    private SecureHttpClient internalTokenHttpClient
 
     @Inject
     private SecureHttpClient secureHttpClient
@@ -91,20 +92,29 @@ class DefaultScheduleService implements ScheduleService {
 
     @Override
     void enqueue(ScheduledTask schedule, Repository<ScheduledTask> repository) {
+        enqueueWithToken(schedule, repository, null)
+    }
+
+    private void enqueueWithToken(ScheduledTask schedule, Repository<ScheduledTask> repository, String internalToken) {
         ScheduleType type = ScheduleTypeFactory.create(schedule.type)
         if (shouldBeEnqueued(schedule, type)) {
-            enqueueSchedule(schedule, type, repository)
+            String token = internalToken ?: getInternalToken(schedule.tenantId)
+            enqueueSchedule(schedule, type, repository, token)
         }
     }
 
     @Override
     boolean enqueueAll() {
         List<ScheduledTask> list = getScheduledTasksAcrossAllTenants()
+        Map<String, String> internalTokensByTenant = [:]
         list.each { ScheduledTask st ->
-            String token = getInternalToken(st.tenantId)
+            if (!internalTokensByTenant.containsKey(st.tenantId)) {
+                internalTokensByTenant.put(st.tenantId, getInternalToken(st.tenantId))
+            }
+            String token = internalTokensByTenant.get(st.tenantId)
             SecureHttpClient httpInternalClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromParameter(token)) {}
             Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, httpInternalClient)
-            enqueue(st, repository)
+            enqueueWithToken(st, repository, token)
         }
         return list
     }
@@ -121,12 +131,12 @@ class DefaultScheduleService implements ScheduleService {
         return immediates
     }
 
-    private void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType, Repository<ScheduledTask> repository) {
+    private void enqueueSchedule(ScheduledTask schedule, ScheduleType scheduleType, Repository<ScheduledTask> repository, String internalToken) {
         long nowMillis = Instant.now().toEpochMilli()
         long scheduleSeconds = (long)((nowMillis + scheduleType.getCountdownMillis(schedule)) / 1000)
 
         log.info("Enqueuing schedule ${schedule.name} for ${scheduleSeconds - (nowMillis / 1000)} seconds from now")
-        HttpRequest httpRequest = constructHttpRequest(schedule)
+        HttpRequest httpRequest = constructHttpRequest(schedule, internalToken)
 
         Task.Builder taskBuilder = Task.newBuilder()
                 .setScheduleTime(Timestamp.newBuilder().setSeconds(scheduleSeconds).build())
@@ -145,9 +155,8 @@ class DefaultScheduleService implements ScheduleService {
         client.awaitTermination(3, TimeUnit.SECONDS)
     }
 
-    private HttpRequest constructHttpRequest(ScheduledTask schedule) {
+    private HttpRequest constructHttpRequest(ScheduledTask schedule, String scheduleToken) {
         HttpRequest.Builder httpBuilder = HttpRequest.newBuilder().setUrl(schedule.endpoint).putHeaders("Content-Type", "application/json")
-        String scheduleToken = getInternalToken(schedule.tenantId)
         if (scheduleToken) {
             httpBuilder = httpBuilder.putHeaders(SecureHttpClient.AUTHORIZATION, SecureHttpClient.BEARER_ + scheduleToken)
         }
@@ -186,12 +195,18 @@ class DefaultScheduleService implements ScheduleService {
         try {
             String subject = propertiesProvider.getProperty("clientId")
             InternalTokenRequest tokenRequest = new InternalTokenRequest(subject: subject, tenantId: tenantId)
-            SecureHttpClient appHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromAuthServiceFromPropertiesFile()) {}
-            return appHttpClient.post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
+            return getInternalTokenHttpClient().post("https://auth.trevorism.com/token/internal", new Gson().toJson(tokenRequest))
         } catch (Exception ignored) {
             log.warn("Unable to get token; new schedules will not be authenticated.")
         }
         return null
+    }
+
+    private SecureHttpClient getInternalTokenHttpClient() {
+        if (internalTokenHttpClient == null) {
+            internalTokenHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromAuthServiceFromPropertiesFile()) {}
+        }
+        return internalTokenHttpClient
     }
 
     private List<ScheduledTask> getScheduledTasksAcrossAllTenants() {

@@ -1,3 +1,7 @@
+## 2.6.0
+
+Fix a filter burst issue when schedules are enqueued.
+
 ## 2.5.0
 
 Upgrade to Micronaut 5.0.0, Java 25, Gradle 9.x, and latest dependencies.
