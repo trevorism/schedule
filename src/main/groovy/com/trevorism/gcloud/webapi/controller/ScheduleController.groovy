@@ -74,12 +74,12 @@ class ScheduleController {
     }
 
     @Tag(name = "Schedule Operations")
-    @Operation(summary = "Delete a ScheduledTask with the {name} **Secure")
-    @Delete(value = "schedule/{name}", produces = MediaType.APPLICATION_JSON)
+    @Operation(summary = "Delete a ScheduledTask with the {id} **Secure")
+    @Delete(value = "schedule/{id}", produces = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
-    ScheduledTask delete(String name, Authentication authentication) {
+    ScheduledTask delete(String id, Authentication authentication) {
         String tenantId = tenantIdFromRequest(authentication)
-        scheduleService.delete(name, tenantId)
+        scheduleService.delete(id, tenantId)
     }
 
     private static String tenantIdFromRequest(Authentication authentication) {

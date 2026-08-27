@@ -20,7 +20,7 @@ class ScheduledTaskValidator {
 
     static void validate(ScheduledTask scheduledTask) {
         try{
-            (!scheduledTask.id) ?: Integer.parseInt(scheduledTask.id)
+            (!scheduledTask.id) ?: Long.parseLong(scheduledTask.id)
             if(!scheduledTask.name)
                 throw new RuntimeException("Scheduled task must have a name")
             if(!(["get","post","put","delete","patch"].contains(scheduledTask.httpMethod)))
