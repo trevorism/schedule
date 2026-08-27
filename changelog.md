@@ -1,3 +1,7 @@
+## 2.7.0
+
+Update dependencies and use the versioning plugin. Add acceptance tests.  
+
 ## 2.6.0
 
 Fix a filter burst issue when schedules are enqueued.

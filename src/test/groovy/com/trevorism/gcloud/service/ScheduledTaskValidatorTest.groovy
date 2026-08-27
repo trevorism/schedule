@@ -61,6 +61,16 @@ class ScheduledTaskValidatorTest {
     }
 
     @Test
+    void testValidate_DatastoreGeneratedId() {
+        ScheduledTaskValidator validator = new ScheduledTaskValidator()
+
+        def task = new ScheduledTask(id: "4884080256614400", name: "test1", type: "minute", startDate: new Date(), enabled: false,
+                requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
+
+        validator.validate(task)
+    }
+
+    @Test
     void testValidate_InvalidId() {
         ScheduledTaskValidator validator = new ScheduledTaskValidator()
 

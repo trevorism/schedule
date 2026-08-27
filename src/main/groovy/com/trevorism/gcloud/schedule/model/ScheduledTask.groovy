@@ -9,7 +9,7 @@ import io.swagger.v3.oas.annotations.media.Schema
  */
 class ScheduledTask {
 
-    @Schema(description = "An id value", type = "String", allowableValues = "range[1,2147483647]")
+    @Schema(description = "An id value", type = "String", allowableValues = "range[1,9223372036854775807]")
     String id
     @Schema(description = "Unique name of the task")
     String name
