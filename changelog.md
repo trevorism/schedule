@@ -1,3 +1,7 @@
+## 2.7.1
+
+Fix a few bugs with versioning and passing secrets.
+
 ## 2.7.0
 
 Update dependencies and use the versioning plugin. Add acceptance tests.  
