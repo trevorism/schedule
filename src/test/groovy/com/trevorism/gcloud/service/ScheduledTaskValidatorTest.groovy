@@ -1,6 +1,8 @@
 package com.trevorism.gcloud.service
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Test
 
@@ -38,7 +40,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "get")
 
-        Assertions.assertThrows(RuntimeException, () -> validator.validate(task))
+        assertBadRequest(validator, task)
     }
 
     @Test
@@ -48,7 +50,7 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}",
                 endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json", httpMethod: "execute")
 
-        Assertions.assertThrows(RuntimeException, () -> validator.validate(task))
+        assertBadRequest(validator, task)
     }
 
     @Test
@@ -57,7 +59,7 @@ class ScheduledTaskValidatorTest {
 
         def task = new ScheduledTask(name: "test1", type: "minute", startDate: new Date(), enabled: false, requestJson: "{}", httpMethod: "get")
 
-        Assertions.assertThrows(RuntimeException, () ->validator.validate(task))
+        assertBadRequest(validator, task)
     }
 
     @Test
@@ -77,6 +79,11 @@ class ScheduledTaskValidatorTest {
         def task = new ScheduledTask(id:"test1", name: "test1", type: "minute", startDate: new Date(), enabled: false,
                 requestJson: "{}", endpoint: "https://endpoint-tester-dot-trevorism-testing.appspot.com/api/json")
 
-        Assertions.assertThrows(RuntimeException, () ->validator.validate(task))
+        assertBadRequest(validator, task)
+    }
+
+    private static void assertBadRequest(ScheduledTaskValidator validator, ScheduledTask task) {
+        HttpStatusException e = Assertions.assertThrows(HttpStatusException, () -> validator.validate(task))
+        assert e.status == HttpStatus.BAD_REQUEST
     }
 }

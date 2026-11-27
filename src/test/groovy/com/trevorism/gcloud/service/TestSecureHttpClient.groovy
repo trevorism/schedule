@@ -5,6 +5,7 @@ import com.google.gson.GsonBuilder
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.http.HeadersHttpResponse
 import com.trevorism.http.HttpClient
+import com.trevorism.http.util.InvalidRequestException
 import com.trevorism.https.SecureHttpClient
 import com.trevorism.https.token.ObtainTokenStrategy
 
@@ -12,6 +13,11 @@ class TestSecureHttpClient implements SecureHttpClient{
 
     private Gson gson = new GsonBuilder().disableHtmlEscaping().setDateFormat("yyyy-MM-dd'T'HH:mm:ss'Z'").create()
     List<ScheduledTask> tasks = []
+
+    static SecureHttpClient respondingWith(int statusCode) {
+        Closure fail = { Object[] args -> throw new InvalidRequestException(new RuntimeException("status code: ${statusCode}"), statusCode) }
+        [get: fail, post: fail, put: fail, delete: fail] as SecureHttpClient
+    }
 
     @Override
     ObtainTokenStrategy getObtainTokenStrategy() {
