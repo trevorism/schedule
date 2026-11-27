@@ -2,6 +2,8 @@ package com.trevorism.gcloud.service
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.http.util.CleanUrl
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 
 /**
  * @author tbrooks
@@ -29,7 +31,7 @@ class ScheduledTaskValidator {
                 throw new RuntimeException("Endpoint not specified")
 
         }catch (Exception e){
-            throw new RuntimeException("Error creating schedule: ${e.message}")
+            throw new HttpStatusException(HttpStatus.BAD_REQUEST, "Error creating schedule: ${e.message}")
         }
     }
 }

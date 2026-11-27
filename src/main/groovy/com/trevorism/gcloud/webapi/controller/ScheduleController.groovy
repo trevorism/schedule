@@ -49,14 +49,8 @@ class ScheduleController {
     @Post(value = "schedule", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(value = Roles.USER, allowInternal = true)
     ScheduledTask create(@Body ScheduledTask schedule, Authentication authentication) {
-        try {
-            String tenantId = tenantIdFromRequest(authentication)
-            ScheduledTask createdSchedule = scheduleService.create(schedule, tenantId)
-            return createdSchedule
-        } catch (Exception e) {
-            log.error("Unable to create scheduled task", e)
-            throw new RuntimeException("Unable to create due to: ${e.message}")
-        }
+        String tenantId = tenantIdFromRequest(authentication)
+        scheduleService.create(schedule, tenantId)
     }
 
     @Tag(name = "Schedule Operations")
@@ -64,13 +58,7 @@ class ScheduleController {
     @Put(value = "schedule/{id}", produces = MediaType.APPLICATION_JSON, consumes = MediaType.APPLICATION_JSON)
     @Secure(Roles.USER)
     ScheduledTask update(String id, @Body ScheduledTask schedule) {
-        try {
-            ScheduledTask updatedSchedule = scheduleService.update(id, schedule)
-            return updatedSchedule
-        } catch (Exception e) {
-            log.error("Unable to update scheduled task", e)
-            throw new RuntimeException("Unable to update due to: ${e.message}")
-        }
+        scheduleService.update(id, schedule)
     }
 
     @Tag(name = "Schedule Operations")

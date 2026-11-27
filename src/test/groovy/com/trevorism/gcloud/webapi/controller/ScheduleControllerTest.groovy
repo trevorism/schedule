@@ -1,9 +1,16 @@
 package com.trevorism.gcloud.webapi.controller
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
+import com.trevorism.gcloud.service.DefaultScheduleService
+import com.trevorism.gcloud.service.TestSecureHttpClient
+import com.trevorism.https.SecureHttpClient
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 import io.micronaut.security.authentication.Authentication
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
+import org.junit.jupiter.api.function.Executable
 
 /**
  * @author tbrooks
@@ -68,4 +75,48 @@ class ScheduleControllerTest {
 
     }
 
+    @Test
+    void testCreateInvalidTaskIsBadRequest() {
+        scheduleController.scheduleService = new DefaultScheduleService()
+        ScheduledTask task = new ScheduledTask(name: "test", httpMethod: "execute", endpoint: "https://example.com")
+        assertStatus(HttpStatus.BAD_REQUEST, () -> scheduleController.create(task, null))
+    }
+
+    @Test
+    void testUpdateInvalidTaskIsBadRequest() {
+        scheduleController.scheduleService = new DefaultScheduleService()
+        ScheduledTask task = new ScheduledTask(httpMethod: "get", endpoint: "https://example.com")
+        assertStatus(HttpStatus.BAD_REQUEST, () -> scheduleController.update("123", task))
+    }
+
+    @Test
+    void testGetMissingIdIsNotFound() {
+        scheduleController.scheduleService = serviceWithEmptyDatastore()
+        assertStatus(HttpStatus.NOT_FOUND, () -> scheduleController.get("404"))
+    }
+
+    @Test
+    void testUpdateMissingIdIsNotFound() {
+        scheduleController.scheduleService = serviceWithEmptyDatastore()
+        assertStatus(HttpStatus.NOT_FOUND, () -> scheduleController.update("404", TestScheduleService.createTestScheduledTaskNow()))
+    }
+
+    @Test
+    void testDeleteMissingIdIsNotFound() {
+        scheduleController.scheduleService = serviceWithEmptyDatastore()
+        assertStatus(HttpStatus.NOT_FOUND, () -> scheduleController.delete("404", null))
+    }
+
+    private static DefaultScheduleService serviceWithEmptyDatastore() {
+        SecureHttpClient datastore = TestSecureHttpClient.respondingWith(HttpStatus.NOT_FOUND.code)
+        DefaultScheduleService service = new DefaultScheduleService()
+        service.secureHttpClient = datastore
+        service.singletonClient = datastore
+        return service
+    }
+
+    private static void assertStatus(HttpStatus expected, Executable call) {
+        HttpStatusException e = Assertions.assertThrows(HttpStatusException, call)
+        assert e.status == expected
+    }
 }

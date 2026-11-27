@@ -1,9 +1,11 @@
 package com.trevorism.gcloud.service
 
 import com.trevorism.PropertiesProvider
+import com.trevorism.data.exception.DataOperationException
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.gcloud.webapi.controller.TestScheduleService
+import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 
@@ -44,6 +46,12 @@ class DefaultScheduleServiceTest {
         assert task.name == "test"
         assert task.id == "123"
         assert !task.enabled
+    }
+
+    @Test
+    void testGetPropagatesDatastoreFailuresOtherThanNotFound() {
+        scheduleService.secureHttpClient = TestSecureHttpClient.respondingWith(500)
+        Assertions.assertThrows(DataOperationException, () -> scheduleService.get("123"))
     }
 
     @Test

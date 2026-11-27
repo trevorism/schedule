@@ -8,6 +8,7 @@ import com.google.protobuf.Timestamp
 import com.trevorism.PropertiesProvider
 import com.trevorism.data.FastDatastoreRepository
 import com.trevorism.data.Repository
+import com.trevorism.data.exception.DataOperationException
 import com.trevorism.gcloud.schedule.model.DatastoreTokenRequest
 import com.trevorism.gcloud.schedule.model.InternalTokenRequest
 import com.trevorism.gcloud.schedule.model.ScheduledTask
@@ -15,10 +16,13 @@ import com.trevorism.gcloud.service.type.ScheduleType
 import com.trevorism.gcloud.service.type.ScheduleTypeFactory
 import com.trevorism.http.HttpClient
 import com.trevorism.http.JsonHttpClient
+import com.trevorism.http.util.InvalidRequestException
 import com.trevorism.https.SecureHttpClient
 import com.trevorism.https.SecureHttpClientBase
 import com.trevorism.https.token.ObtainTokenFromAuthServiceFromPropertiesFile
 import com.trevorism.https.token.ObtainTokenFromParameter
+import io.micronaut.http.HttpStatus
+import io.micronaut.http.exceptions.HttpStatusException
 import jakarta.inject.Inject
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -55,7 +59,7 @@ class DefaultScheduleService implements ScheduleService {
     @Override
     ScheduledTask get(String id) {
         Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, secureHttpClient)
-        repository.get(id)
+        findById(repository, id)
     }
 
     @Override
@@ -83,11 +87,27 @@ class DefaultScheduleService implements ScheduleService {
         String scheduleToken = getInternalToken(tenantId)
         SecureHttpClient internalSecureHttpClient = new SecureHttpClientBase(singletonClient, new ObtainTokenFromParameter(scheduleToken)) {}
         Repository<ScheduledTask> repository = new FastDatastoreRepository<>(ScheduledTask, internalSecureHttpClient)
-        ScheduledTask task = repository.get(id)
+        ScheduledTask task = findById(repository, id)
         if (task) {
             repository.delete(task.id)
         }
         return task
+    }
+
+    private static ScheduledTask findById(Repository<ScheduledTask> repository, String id) {
+        try {
+            return repository.get(id)
+        } catch (DataOperationException e) {
+            if (isNotFound(e)) {
+                throw new HttpStatusException(HttpStatus.NOT_FOUND, "Scheduled task ${id} not found")
+            }
+            throw e
+        }
+    }
+
+    private static boolean isNotFound(DataOperationException e) {
+        Throwable cause = e.cause
+        cause instanceof InvalidRequestException && cause.statusCode == HttpStatus.NOT_FOUND.code
     }
 
     @Override
