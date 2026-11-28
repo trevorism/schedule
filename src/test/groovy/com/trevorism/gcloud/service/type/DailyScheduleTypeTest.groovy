@@ -1,15 +1,19 @@
 package com.trevorism.gcloud.service.type
 
-import com.trevorism.gcloud.webapi.controller.TestScheduleService
+import com.trevorism.gcloud.schedule.model.ScheduledTask
 import org.junit.jupiter.api.Test
 
-import java.time.ZoneId
+import java.time.Clock
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
  * @author tbrooks
  */
 class DailyScheduleTypeTest {
+
+    private static final long ONE_MINUTE = 60 * 1000L
+    private static final long ONE_DAY = 24 * 60 * ONE_MINUTE
 
     @Test
     void testGetName() {
@@ -18,87 +22,67 @@ class DailyScheduleTypeTest {
     }
 
     @Test
-    void testGetCountdownMillis() {
+    void testNoStartDateWillNeverEnqueue() {
         def type = new DailyScheduleType()
-
-        long millisForEarlier = type.getCountdownMillis(TestScheduleService.createTestScheduledEarlier())
-
-        assert -1L == type.getCountdownMillis(TestScheduleService.createTestScheduledTaskNow())
-        assert -1L == millisForEarlier || 84600000L == millisForEarlier //this can happen if the hour UTC > 23
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledLater()) > 0
-        assert type.getCountdownMillis(TestScheduleService.createTestScheduledLater()) < 1000 * 60 * 60
-
+        assert ScheduleType.WILL_NEVER_ENQUEUE == type.getCountdownMillis(new ScheduledTask())
     }
 
     @Test
-    void testSecondsLaterCase(){
-        def type = new DailyScheduleType()
-        long millis = type.getCountdownMillis(TestScheduleService.createTestScheduledLater())
-        assert millis <= 30100 && millis != -1
+    void testSecondsLaterToday() {
+        assert 30000L == countdown(utc(2022, 5, 9, 10, 0, 0), utc(2022, 5, 9, 10, 0, 30))
     }
 
     @Test
-    void testEdgeCaseOverADayBreak(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2022,5,10,0,30,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2022,5,9,23,50,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == 2400000
+    void testSecondsLaterDuringElevenPmHour() {
+        assert 30000L == countdown(utc(2026, 11, 27, 23, 5, 0), utc(2026, 11, 27, 23, 5, 30))
     }
 
     @Test
-    void testEdgeCaseOverADayBreakFromPreviousDay(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2022,5,5,0,30,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2022,5,9,23,50,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == 2400000
+    void testMinutesLaterDuringElevenPmHourFromPreviousDays() {
+        assert 30 * ONE_MINUTE == countdown(utc(2026, 11, 27, 23, 5, 0), utc(2026, 11, 23, 23, 35, 0))
     }
 
     @Test
-    void testFarApartSameDay(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2022,5,9,6,30,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2022,5,9,18,55,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == -1
+    void testExactlyNowRollsToTomorrow() {
+        assert ONE_DAY == countdown(utc(2022, 5, 9, 10, 0, 0), utc(2022, 5, 9, 10, 0, 0))
     }
 
     @Test
-    void testFarApartSameDayInFuture(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2022,5,9,18,30,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2022,5,9,6,55,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == -1
+    void testEarlierTodayRollsToTomorrow() {
+        assert ONE_DAY - 30 * ONE_MINUTE == countdown(utc(2022, 5, 9, 10, 30, 0), utc(2022, 5, 9, 10, 0, 0))
     }
 
     @Test
-    void testEdgeCaseOverAYearBreak(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2022,1,1,0,20,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2021,12,31,23,30,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == 3000000
+    void testLaterTodayFromPastStartDate() {
+        assert (11 * 60 + 35) * ONE_MINUTE == countdown(utc(2022, 5, 9, 6, 55, 30), utc(2022, 5, 1, 18, 30, 30))
     }
 
     @Test
-    void testEdgeCaseOverAYearBreakFromPreviousYear(){
-        ZonedDateTime desiredTime = ZonedDateTime.of(2021,1,1,0,20,30,0,ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.of(2021,12,31,23,30,30,0,ZoneId.of("UTC"))
-        long countdownTime = getCountdownMillisBasedOnDailyLogic(now, desiredTime)
-        assert countdownTime == 3000000
+    void testEdgeCaseOverADayBreak() {
+        assert 2400000L == countdown(utc(2022, 5, 9, 23, 50, 30), utc(2022, 5, 10, 0, 30, 30))
     }
 
-    private static long getCountdownMillisBasedOnDailyLogic(ZonedDateTime now, ZonedDateTime desiredTime) {
-        ZonedDateTime targetTime = now.withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
-
-        if(now.getHour() == 23){
-            ZonedDateTime myDay = now.plusDays(1)
-            targetTime = targetTime.withYear(myDay.getYear()).withMonth(myDay.getMonthValue())
-                    .withDayOfMonth(myDay.getDayOfMonth()).withHour(desiredTime.getHour())
-        }
-
-        long countdownTime = targetTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
-        if(countdownTime <= 0){
-            return -1
-        }
-        return countdownTime
+    @Test
+    void testEdgeCaseOverADayBreakFromPreviousDay() {
+        assert 2400000L == countdown(utc(2022, 5, 9, 23, 50, 30), utc(2022, 5, 5, 0, 30, 30))
     }
 
+    @Test
+    void testEdgeCaseOverAYearBreak() {
+        assert 3000000L == countdown(utc(2021, 12, 31, 23, 30, 30), utc(2022, 1, 1, 0, 20, 30))
+    }
+
+    @Test
+    void testEdgeCaseOverAYearBreakFromPreviousYear() {
+        assert 3000000L == countdown(utc(2021, 12, 31, 23, 30, 30), utc(2021, 1, 1, 0, 20, 30))
+    }
+
+    private static long countdown(ZonedDateTime now, ZonedDateTime startDate) {
+        def type = new DailyScheduleType(Clock.fixed(now.toInstant(), ZoneOffset.UTC))
+        type.getCountdownMillis(new ScheduledTask(startDate: Date.from(startDate.toInstant())))
+    }
+
+    private static ZonedDateTime utc(int year, int month, int day, int hour, int minute, int second) {
+        ZonedDateTime.of(year, month, day, hour, minute, second, 0, ZoneOffset.UTC)
+    }
 }

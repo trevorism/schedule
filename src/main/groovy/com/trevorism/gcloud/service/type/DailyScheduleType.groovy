@@ -2,13 +2,28 @@ package com.trevorism.gcloud.service.type
 
 import com.trevorism.gcloud.schedule.model.ScheduledTask
 
-import java.time.ZoneId
+import java.time.Clock
+import java.time.Duration
+import java.time.Instant
+import java.time.LocalTime
+import java.time.ZoneOffset
 import java.time.ZonedDateTime
 
 /**
  * @author tbrooks
  */
 class DailyScheduleType implements ScheduleType {
+
+    private final Clock clock
+
+    DailyScheduleType() {
+        this(Clock.systemUTC())
+    }
+
+    DailyScheduleType(Clock clock) {
+        this.clock = clock
+    }
+
     @Override
     String getName() {
         ScheduleTypeFactory.DAILY
@@ -20,20 +35,14 @@ class DailyScheduleType implements ScheduleType {
             return WILL_NEVER_ENQUEUE
         }
 
-        ZonedDateTime desiredTime = schedule.startDate.toInstant().atZone(ZoneId.of("UTC"))
-        ZonedDateTime now = ZonedDateTime.now(ZoneId.of("UTC"))
-        ZonedDateTime targetTime = ZonedDateTime.now(ZoneId.of("UTC")).withHour(desiredTime.getHour()).withMinute(desiredTime.getMinute()).withSecond(desiredTime.getSecond())
+        ZonedDateTime now = Instant.now(clock).atZone(ZoneOffset.UTC)
+        LocalTime desiredTime = schedule.startDate.toInstant().atZone(ZoneOffset.UTC).toLocalTime()
+        ZonedDateTime targetTime = now.with(desiredTime)
 
-        if(now.getHour() == 23) {
-            ZonedDateTime myDay = now.plusDays(1)
-            targetTime = targetTime.withYear(myDay.getYear()).withMonth(myDay.getMonthValue())
-                    .withDayOfMonth(myDay.getDayOfMonth()).withHour(desiredTime.getHour())
+        if(!targetTime.isAfter(now)){
+            targetTime = targetTime.plusDays(1)
         }
 
-        long countdownTime = targetTime.toInstant().toEpochMilli() - now.toInstant().toEpochMilli()
-        if(countdownTime <= 0){
-            return WILL_NEVER_ENQUEUE
-        }
-        return countdownTime
+        return Duration.between(now, targetTime).toMillis()
     }
 }
